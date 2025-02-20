@@ -1,0 +1,133 @@
+<div class="data-table">
+  <table class="data-table__table">
+    <thead class="data-table__header">
+      <tr>
+        @for (header of headers; track header.id) {
+        <th
+          [style.width]="header.width"
+          class="data-table__header-cell"
+          (click)="header.sort ? sortTable(header.id) : null"
+          [class.asc]="sortColumn === header.id && sortDirection === 'asc'"
+          [class.desc]="sortColumn === header.id && sortDirection === 'desc'"
+        >
+          <div class="data-table__header-container">
+            <span class="data-table__header-text">
+              {{
+                header.label.length > 10
+                  ? (header.label | slice : 0 : 10) + ".."
+                  : header.label
+              }}
+            </span>
+            @if (header.info) {
+            <div class="tooltip">
+              <span class="tooltip-icon">i</span>
+              <span class="tooltiptext">{{ header.label }}</span>
+            </div>
+            } @if (header.sort) {
+            <div class="sort-icon">
+              <span *ngIf="sortColumn !== header.id">▲</span>
+              <span *ngIf="sortColumn === header.id && sortDirection === 'asc'"
+                >▲</span
+              >
+              <span *ngIf="sortColumn === header.id && sortDirection === 'desc'"
+                >▼</span
+              >
+            </div>
+            }
+          </div>
+        </th>
+        } @if (actions?.length) {
+        <th class="data-table__header-cell">Acciones</th>
+        }
+      </tr>
+    </thead>
+
+    <tbody class="data-table__body">
+      @for (row of paginatedRows; track row.id) {
+      <tr class="data-table__body-row">
+        @for (header of headers; track header.id) {
+        <td class="data-table__body-row-cell">
+          <ng-container *ngIf="row.columnMap[header.id] as column">
+            @if (column.avatar) {
+            <img
+              [ngClass]="'data-table__image--' + column.avatar.size"
+              [src]="column.avatar.src"
+              alt="Avatar"
+            />
+            } @else {
+            <div class="data-table__cell-content">
+              <strong class="data-table__primary-text">{{
+                column.primaryText
+              }}</strong>
+              @if (column.secundaryText) {
+              <p class="data-table__secondary-text">
+                {{ column.secundaryText }}
+              </p>
+              }
+            </div>
+            }
+          </ng-container>
+        </td>
+
+        } @if (actions?.length) {
+        <td class="data-table__actions">
+          <div class="dropdown">
+            <button class="dropdown-toggle" (click)="toggleMenu(row.id)">
+              ⋮
+            </button>
+            <div class="dropdown-menu" [class.show]="openMenuId === row.id">
+              @for (action of actions; track action.label) {
+              <a (click)="handleAction(action.label, row)">{{
+                action.label
+              }}</a>
+              }
+            </div>
+          </div>
+        </td>
+        }
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<!-- PAGINACIÓN -->
+@if (showPagination) {
+<div class="data-table__pagination">
+  <p>{{ rows.length }} Resultados</p>
+  <div class="pagination-controls">
+    <button (click)="changePage(1)" [disabled]="currentPage === 1">«</button>
+    <button
+      (click)="changePage(currentPage - 1)"
+      [disabled]="currentPage === 1"
+    >
+      ‹
+    </button>
+
+    @for (page of totalPagesArray; track page) {
+    <button (click)="changePage(page)" [class.active]="page === currentPage">
+      {{ page }}
+    </button>
+    }
+
+    <button
+      (click)="changePage(currentPage + 1)"
+      [disabled]="currentPage === totalPages"
+    >
+      ›
+    </button>
+    <button
+      (click)="changePage(totalPages)"
+      [disabled]="currentPage === totalPages"
+    >
+      »
+    </button>
+
+    <select (change)="onPageSizeChange($event)">
+      @for (option of pageSizeOptions; track option) {
+      <option [value]="option">{{ option }}</option>
+      }
+    </select>
+  </div>
+</div>
+}

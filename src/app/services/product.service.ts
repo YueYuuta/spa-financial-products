@@ -12,7 +12,7 @@ export class ProductService {
 
   /** Obtiene todos los productos */
   getProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(this.apiUrl);
+    return this.http.get<Product[]>('/api/bp/products');
   }
 
   /** Obtiene un producto por ID */

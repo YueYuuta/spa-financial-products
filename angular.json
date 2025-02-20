@@ -60,21 +60,22 @@
           },
           "defaultConfiguration": "production"
         },
-        "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
-          "configurations": {
-            "production": {
-              "buildTarget": "spa-financial-products:build:production"
-            },
-            "development": {
-              "buildTarget": "spa-financial-products:build:development"
-            }
-          },
-          "defaultConfiguration": "development"
-        },
-        "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n"
-        },
+       "serve": {
+  "options": {
+    "proxyConfig": "proxy.conf.json"
+  },
+  "builder": "@angular-devkit/build-angular:dev-server",
+  "configurations": {
+    "production": {
+      "buildTarget": "spa-financial-products:build:production"
+    },
+    "development": {
+      "buildTarget": "spa-financial-products:build:development",
+      "proxyConfig": "proxy.conf.json"
+    }
+  },
+  "defaultConfiguration": "development"
+},
        "test": {
           "builder": "jest"
         }

@@ -1,1 +1,17 @@
 /* You can add global styles to this file, and also import other style files */
+/*==================== GOOGLE FONTS ====================*/
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap");
+
+/*==================== VARIABLES CSS ====================*/
+
+*,
+:after,
+:before {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  margin: 0;
+  padding: 0;
+}
