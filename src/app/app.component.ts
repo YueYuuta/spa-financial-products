@@ -8,7 +8,7 @@ import { ProductListComponent } from './pages/product-list/product-list.componen
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, DataTableComponent, ProductListComponent],
+  imports: [RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

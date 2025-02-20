@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { Product, TableAction, TableHeader, TableRow } from '../../interfaces';
 import { ProductService } from '../../services/product.service';
 import { DataTableComponent } from '../../components/organisms/data-table/data-table.component';
 import { productsMock } from '../../mock/data';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, Subject } from 'rxjs';
+import { Store } from '@ngrx/store';
+import * as ProductActions from '../../store/actions/product.action';
 
 @Component({
   selector: 'app-product-list',
@@ -14,6 +16,15 @@ import { debounceTime, Subject } from 'rxjs';
   imports: [DataTableComponent, FormsModule],
 })
 export class ProductListComponent implements OnInit {
+  private store = inject(
+    Store<{
+      products: { products: Product[]; isEmpty: boolean; error: string | null };
+    }>
+  );
+  products$ = this.store.select((state) => state.products.products);
+  isEmpty$ = this.store.select((state) => state.products.isEmpty);
+  error$ = this.store.select((state) => state.products.error);
+  isLoading = signal(true);
   searchTerm = '';
   searchSubject = new Subject<string>();
   filteredRows: TableRow[] = [];
@@ -71,15 +82,30 @@ export class ProductListComponent implements OnInit {
   }
 
   private fetchProducts(): void {
-    this.productService.getProducts().subscribe((products) => {
-      console.log(
-        '🚀 ~ ProductListComponent ~ this.productService.getProducts ~ products:',
-        products
-      );
-      this.rows = productsMock.map((product) =>
-        this.mapProductToTableRow(product)
-      );
-      this.filteredRows = [...this.rows];
+    // this.productService.getProducts().subscribe((products) => {
+    //   console.log(
+    //     '🚀 ~ ProductListComponent ~ this.productService.getProducts ~ products:',
+    //     products
+    //   );
+    //   this.rows = productsMock.map((product) =>
+    //     this.mapProductToTableRow(product)
+    //   );
+    //   this.filteredRows = [...this.rows];
+    // });
+
+    this.products$.subscribe((products) => {
+      if (products.length === 0) {
+        console.log(
+          '🚀 ~ ProductListComponent ~ this.products$.subscribe ~ products:',
+          products
+        );
+        // Si el store está vacío, intentamos cargar desde la API
+        this.store.dispatch(ProductActions.loadProducts());
+      } else {
+        // Si ya hay productos, marcamos como listo
+        this.isLoading.set(false);
+        this.filteredRows = [...products];
+      }
     });
   }
 

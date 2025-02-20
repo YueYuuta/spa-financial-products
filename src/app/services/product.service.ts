@@ -1,42 +1,33 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Product } from '../interfaces';
+import { Product } from '../store/models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
-  private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:3002/bp/products';
+  private apiUrl = '/api/bp/products';
 
-  /** Obtiene todos los productos */
-  getProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>('/api/bp/products');
+  constructor(private http: HttpClient) {}
+
+  getProducts(): Observable<{ data: Product[] }> {
+    return this.http.get<{ data: Product[] }>(this.apiUrl);
   }
 
-  /** Obtiene un producto por ID */
-  getProductById(id: string): Observable<Product> {
-    return this.http.get<Product>(`${this.apiUrl}/${id}`);
+  createProduct(product: Product): Observable<{ data: Product }> {
+    return this.http.post<{ data: Product }>(this.apiUrl, product);
   }
 
-  /** Crea un nuevo producto */
-  addProduct(product: Product): Observable<Product> {
-    return this.http.post<Product>(this.apiUrl, product);
+  updateProduct(id: string, product: Product): Observable<{ data: Product }> {
+    return this.http.put<{ data: Product }>(`${this.apiUrl}/${id}`, product);
   }
 
-  /** Actualiza un producto existente */
-  updateProduct(id: string, product: Partial<Product>): Observable<Product> {
-    return this.http.put<Product>(`${this.apiUrl}/${id}`, product);
+  deleteProduct(id: string): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/${id}`);
   }
 
-  /** Elimina un producto por ID */
-  deleteProduct(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
-
-  /** Verifica si un ID de producto existe */
-  checkProductIdExists(id: string): Observable<boolean> {
+  verifyProduct(id: string): Observable<boolean> {
     return this.http.get<boolean>(`${this.apiUrl}/verification/${id}`);
   }
 }
