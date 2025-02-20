@@ -1,0 +1,39 @@
+<div class="data-table__pagination">
+  <p>{{ totalItems }} Resultados</p>
+  <div class="pagination-controls">
+    <button (click)="changePage(1)" [disabled]="currentPage === 1">«</button>
+    <button
+      (click)="changePage(currentPage - 1)"
+      [disabled]="currentPage === 1"
+    >
+      ‹
+    </button>
+
+    <button
+      *ngFor="let page of totalPagesArray"
+      (click)="changePage(page)"
+      [class.active]="page === currentPage"
+    >
+      {{ page }}
+    </button>
+
+    <button
+      (click)="changePage(currentPage + 1)"
+      [disabled]="currentPage === totalPages"
+    >
+      ›
+    </button>
+    <button
+      (click)="changePage(totalPages)"
+      [disabled]="currentPage === totalPages"
+    >
+      »
+    </button>
+
+    <select (change)="onPageSizeChange($event)">
+      <option *ngFor="let option of pageSizeOptions" [value]="option">
+        {{ option }}
+      </option>
+    </select>
+  </div>
+</div>

@@ -1,6 +1,14 @@
+<input
+  type="text"
+  [(ngModel)]="searchTerm"
+  (input)="filterRows()"
+  placeholder="Buscar..."
+  class="search-input"
+/>
+
 <app-data-table
   [headers]="headers"
-  [rows]="rows"
+  [rows]="filteredRows"
   [actions]="actions"
   [showPagination]="true"
   (clickAction)="handleAction($event)"
