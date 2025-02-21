@@ -34,18 +34,12 @@ export class ProductEffects {
         this.productService.verifyProduct(id).pipe(
           mergeMap((exists) => {
             if (exists) {
-              console.log(
-                `✅ ID ${id} existe en la base de datos, buscando en el Store...`
-              );
-
               return this.store.select(selectProductById(id)).pipe(
                 take(1),
                 map((product) => {
                   if (product) {
-                    console.log('✅ Producto encontrado en el Store:', product);
                     return ProductActions.selectProductSuccess({ product });
                   } else {
-                    console.log('❌ Producto no encontrado en el Store.');
                     return ProductActions.selectProductFailure({
                       error: 'El producto no está disponible en el sistema.',
                     });
@@ -53,7 +47,6 @@ export class ProductEffects {
                 })
               );
             } else {
-              console.log(`❌ El ID ${id} no existe en la base de datos.`);
               return of(
                 ProductActions.selectProductFailure({
                   error: 'El ID no existe.',
@@ -78,7 +71,6 @@ export class ProductEffects {
       this.actions$.pipe(
         ofType(ProductActions.selectProductSuccess),
         tap(({ product }) => {
-          console.log('✅ Navegando a la edición de:', product.id);
           this.router.navigate(['/financial-products/update']);
         })
       ),
@@ -152,22 +144,14 @@ export class ProductEffects {
         this.productService.verifyProduct(id).pipe(
           mergeMap((exists) => {
             if (exists) {
-              console.log(
-                `✅ ID ${id} existe en la base de datos, buscando en el Store...`
-              );
-
               return this.store.select(selectProductById(id)).pipe(
                 take(1),
                 map((product) => {
-                  console.log('🚀 ~ ProductEffects ~ map ~ product:', product);
                   if (product) {
-                    console.log('✅ Producto encontrado en el Store:', product);
                     return ProductActions.selectProductToDeleteSuccess({
                       product,
                     });
                   } else {
-                    console.log(id);
-                    console.log('❌ Producto no encontrado en el Store.');
                     return ProductActions.selectProductToDeleteFailure({
                       error: 'El producto no está disponible en el sistema.',
                     });
@@ -175,7 +159,6 @@ export class ProductEffects {
                 })
               );
             } else {
-              console.log(`❌ El ID ${id} no existe en la base de datos.`);
               return of(
                 ProductActions.selectProductToDeleteFailure({
                   error: 'El ID no existe.',

@@ -166,10 +166,6 @@ export class ProductListComponent implements OnInit {
   }
 
   handleAction(event: { action: string; row: TableRow }) {
-    console.log(
-      '🚀 ~ ProductListComponent ~ handleAction ~ row:',
-      event.row.id
-    );
     if (event.action === 'Editar') {
       this.store.dispatch(
         ProductActions.selectProductById({ id: event.row.id })
@@ -207,7 +203,6 @@ export class ProductListComponent implements OnInit {
             );
 
             contentRef.instance.formSubmit.pipe(take(1)).subscribe(() => {
-              console.log('✅ Eliminando producto:', product.id);
               this.store.dispatch(
                 ProductActions.deleteProduct({ id: product.id })
               );
@@ -215,12 +210,10 @@ export class ProductListComponent implements OnInit {
             });
 
             contentRef.instance.formCancel.pipe(take(1)).subscribe(() => {
-              console.log('❌ Cancelado por el usuario.');
               this._modalService.hide();
             });
           }
         });
     }
-    console.log(`Acción ejecutada: ${event.action}`, event.row);
   }
 }

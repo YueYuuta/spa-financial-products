@@ -182,7 +182,6 @@ export class FormProductComponent {
         date_revision: this.toUTCDateString(productData.date_revision),
       };
 
-      console.log('🚀 Guardando producto:', formattedProduct); // 🔍 Verificar en la consola
       this.formSubmit.emit(formattedProduct);
     }
   }
@@ -210,15 +209,12 @@ export class FormProductComponent {
       // ✅ Convertir la fecha seleccionada al formato correcto sin la hora
       const selectedDate = new Date(control.value + 'T00:00:00'); // 🔹 Forzar a medianoche para evitar desfases de zona horaria
       selectedDate.setHours(0, 0, 0, 0);
-      console.log(
-        '🚀 ~ FormProductComponent ~ return ~ selectedDate:',
-        selectedDate
-      );
+
       // ✅ Obtener la fecha actual sin la hora
       const today = new Date();
 
       today.setHours(0, 0, 0, 0);
-      console.log('🚀 ~ FormProductComponent ~ return ~ today:', today);
+
       return selectedDate >= today ? null : { invaliddate: true };
     };
   }

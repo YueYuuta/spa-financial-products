@@ -16,6 +16,7 @@ module.exports = {
         "<rootDir>/src/environments/",    // Ignora carpetas de entorno
         "<rootDir>/src/app/app.config\\.ts$",  // Ignora app.config.ts
         "<rootDir>/src/app/app.routes\\.ts$",  // Ignora app.routes.ts
+        
       ],
       
       

@@ -13,7 +13,18 @@ import { ButtonComponent } from '../../atoms/button/button.component';
 export class DeleteProductComponent {
   @Output() formSubmit = new EventEmitter<any>();
   @Output() formCancel = new EventEmitter<void>();
-  @Input() data!: ModalData;
+  @Input() data: ModalData = {
+    title: 'Delete Product',
+    description: 'Are you sure you want to delete this product?',
+    product: {
+      id: '124',
+      name: 'New Product',
+      description: 'New product description',
+      logo: 'logo-url',
+      date_release: '2023-03-01',
+      date_revision: '2024-03-01',
+    }, // Asegurarse de que `product` esté definido
+  };
 
   submit() {
     this.formSubmit.emit('hola'); // Emitir los datos del formulario

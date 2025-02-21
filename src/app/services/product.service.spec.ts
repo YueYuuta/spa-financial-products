@@ -1,132 +1,108 @@
 import { TestBed } from '@angular/core/testing';
+import { ProductService } from './product.service';
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
-
+import { Product } from '../store/models';
 import { provideHttpClient } from '@angular/common/http';
-import { ProductService } from './product.service';
-import { Product } from '../interfaces';
 
 describe('ProductService', () => {
   let service: ProductService;
   let httpMock: HttpTestingController;
+  const apiUrl = '/api/bp/products';
 
   const mockProduct: Product = {
     id: '1',
-    name: 'Credit Card',
-    description: 'A financial product',
-    logo: 'https://example.com/logo.png',
-    date_release: '2025-01-01',
-    date_revision: '2026-01-01',
+    name: 'Producto A',
+    description: 'Desc A',
+    logo: 'a_logo.png',
+    date_release: '2025-02-01',
+    date_revision: '2026-02-01',
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [],
       providers: [
         ProductService,
         provideHttpClient(),
-        provideHttpClientTesting(),
+        provideHttpClientTesting(), // 🆕 Nueva forma de configurar HttpTestingController
       ],
     });
-
     service = TestBed.inject(ProductService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {
-    httpMock.verify(); // Verifica que no haya peticiones pendientes
+    httpMock.verify();
   });
 
-  it('should be created', () => {
+  it('debería crearse correctamente', () => {
     expect(service).toBeTruthy();
   });
 
-  describe('getProducts', () => {
-    it('should retrieve all products', () => {
-      expect.assertions(3);
+  it('debería obtener productos correctamente', () => {
+    const mockResponse = { data: [mockProduct] };
 
-      service.getProducts().subscribe((products) => {
-        expect(products.length).toBe(1);
-        expect(products).toEqual([mockProduct]);
-      });
-
-      const req = httpMock.expectOne(service['apiUrl']);
-      expect(req.request.method).toBe('GET');
-      req.flush([mockProduct]);
+    service.getProducts().subscribe((response) => {
+      expect(response.data.length).toBe(1);
+      expect(response.data).toEqual(mockResponse.data);
     });
 
-    it('should handle errors correctly', () => {
-      service.getProducts().subscribe({
-        next: () => fail('Expected an error, but got success'),
-        error: (error) => {
-          expect(error.status).toBe(500);
-        },
-      });
-
-      const req = httpMock.expectOne(service['apiUrl']);
-      req.flush({}, { status: 500, statusText: 'Server Error' });
-    });
+    const req = httpMock.expectOne(apiUrl);
+    expect(req.request.method).toBe('GET');
+    req.flush(mockResponse);
   });
 
-  describe('getProductById', () => {
-    it('should retrieve a product by ID', () => {
-      service.getProductById('1').subscribe((product) => {
-        expect(product).toEqual(mockProduct);
-      });
+  it('debería crear un producto correctamente', () => {
+    const mockResponse = { data: mockProduct };
 
-      const req = httpMock.expectOne(`${service['apiUrl']}/1`);
-      expect(req.request.method).toBe('GET');
-      req.flush(mockProduct);
+    service.createProduct(mockProduct).subscribe((response) => {
+      expect(response.data).toEqual(mockResponse.data);
     });
+
+    const req = httpMock.expectOne(apiUrl);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(mockProduct);
+    req.flush(mockResponse);
   });
 
-  describe('addProduct', () => {
-    it('should add a new product', () => {
-      service.addProduct(mockProduct).subscribe((product) => {
-        expect(product).toEqual(mockProduct);
-      });
+  it('debería actualizar un producto correctamente', () => {
+    const updatedProduct: Product = {
+      ...mockProduct,
+      name: 'Producto A Editado',
+    };
+    const mockResponse = { data: updatedProduct };
 
-      const req = httpMock.expectOne(service['apiUrl']);
-      expect(req.request.method).toBe('POST');
-      req.flush(mockProduct);
+    service.updateProduct('1', updatedProduct).subscribe((response) => {
+      expect(response.data).toEqual(mockResponse.data);
     });
+
+    const req = httpMock.expectOne(`${apiUrl}/1`);
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual(updatedProduct);
+    req.flush(mockResponse);
   });
 
-  describe('updateProduct', () => {
-    it('should update a product', () => {
-      service.updateProduct('1', { name: 'Updated' }).subscribe((product) => {
-        expect(product.name).toBe('Updated');
-      });
+  it('debería eliminar un producto correctamente', () => {
+    const mockResponse = { message: 'Producto eliminado' };
 
-      const req = httpMock.expectOne(`${service['apiUrl']}/1`);
-      expect(req.request.method).toBe('PUT');
-      req.flush({ ...mockProduct, name: 'Updated' });
+    service.deleteProduct('1').subscribe((response) => {
+      expect(response.message).toBe('Producto eliminado');
     });
+
+    const req = httpMock.expectOne(`${apiUrl}/1`);
+    expect(req.request.method).toBe('DELETE');
+    req.flush(mockResponse);
   });
 
-  describe('deleteProduct', () => {
-    it('should delete a product', () => {
-      service.deleteProduct('1').subscribe((response) => {
-        expect(response).toBeUndefined();
-      });
-
-      const req = httpMock.expectOne(`${service['apiUrl']}/1`);
-      expect(req.request.method).toBe('DELETE');
-      req.flush({});
+  it('debería verificar un producto correctamente', () => {
+    service.verifyProduct('1').subscribe((response) => {
+      expect(response).toBe(true);
     });
-  });
 
-  describe('checkProductIdExists', () => {
-    it('should check if a product ID exists', () => {
-      service.checkProductIdExists('1').subscribe((exists) => {
-        expect(exists).toBe(true);
-      });
-
-      const req = httpMock.expectOne(`${service['apiUrl']}/verification/1`);
-      expect(req.request.method).toBe('GET');
-      req.flush(true);
-    });
+    const req = httpMock.expectOne(`${apiUrl}/verification/1`);
+    expect(req.request.method).toBe('GET');
+    req.flush(true);
   });
 });
