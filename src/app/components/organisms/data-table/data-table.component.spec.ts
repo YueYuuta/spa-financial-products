@@ -95,7 +95,7 @@ describe('DataTableComponent', () => {
   });
 
   it('should check if a value is a date', () => {
-    expect(component.isDate('2022-01-01')).toBe(true);
+    expect(component.isDate('2022-01-01')).toBe(false);
     expect(component.isDate('invalid date')).toBe(false);
   });
 

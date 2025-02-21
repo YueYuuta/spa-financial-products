@@ -50,9 +50,19 @@ export class DataTableComponent implements OnInit {
   isDate(value: any): boolean {
     if (!value) return false;
 
-    const date = new Date(value);
+    // Regex para verificar si la cadena tiene un formato ISO válido
+    const isoDateRegex =
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|([+-]\d{2}:\d{2}))$/;
 
-    return !isNaN(date.getTime());
+    // Verificar si el valor es una fecha ISO válida
+    if (isoDateRegex.test(value)) {
+      const date = new Date(value);
+
+      return !isNaN(date.getTime()); // Verificar si la fecha es válida
+    }
+
+    // Si no es un formato ISO válido, retornar false
+    return false;
   }
 
   private processRows() {
