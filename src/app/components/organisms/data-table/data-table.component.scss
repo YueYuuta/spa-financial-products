@@ -19,11 +19,15 @@ $img-sizes: (
     font-size: 12px;
   }
   &__container {
-    overflow-x: auto;
+    @media (max-width: 768px) {
+      overflow-x: auto;
+    }
+
     min-height: 6.25rem;
     /* Personalización de la barra de scroll */
     &::-webkit-scrollbar {
-      height: 6px; /* Grosor de la barra horizontal */
+      height: 4px; /* Grosor de la barra horizontal */
+      width: 4px;
     }
 
     &::-webkit-scrollbar-track {
@@ -121,7 +125,7 @@ $img-sizes: (
 
     .dropdown-toggle {
       cursor: pointer;
-      font-size: 20px;
+      font-size: 14px;
       background: none;
       border: none;
       color: #6c757d;
@@ -130,6 +134,7 @@ $img-sizes: (
       height: 24px;
       border-radius: 50%;
       transition: background 0.2s ease-in-out;
+      cursor: pointer;
 
       &:hover {
         background: rgba(0, 0, 0, 0.1);
@@ -145,17 +150,19 @@ $img-sizes: (
       background: #fff;
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
       border-radius: 6px;
-      min-width: 120px;
+      min-width: 60px;
       z-index: 100;
-      padding: 8px 0;
+
+      font-size: 0.75rem;
 
       a {
         display: block;
-        padding: 10px 16px;
-        font-size: 14px;
+        padding: 0.5rem 0.25rem;
+
         color: #333;
         text-decoration: none;
         transition: background 0.2s ease-in-out;
+        font-size: 0.625rem;
 
         &:hover {
           background: #f1f3f5;

@@ -40,7 +40,7 @@
             </div>
           </th>
           } @if (actions?.length) {
-          <th class="data-table__header-cell"></th>
+          <th class="data-table__header-cell" style="min-width: 80px"></th>
           }
         </tr>
       </thead>
@@ -61,7 +61,7 @@
               <div class="data-table__cell-content">
                 @if (isDate(column.primaryText)) {
                 <span class="data-table__primary-text">{{
-                  column.primaryText | date : "yyyy-MM-dd"
+                  column.primaryText | date : "yyyy-MM-dd" : "UTC"
                 }}</span>
                 }@else{
                 <span class="data-table__primary-text">{{

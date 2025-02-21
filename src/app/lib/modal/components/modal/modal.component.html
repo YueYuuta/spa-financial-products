@@ -1,0 +1,22 @@
+<div class="modal__overlay"></div>
+
+<div class="modal__container" (click)="onContainerClick($event)">
+  <div
+    #modalBox
+    class="modal__box {{ 'modal__box--' + modalClass }}"
+    [ngClass]="{
+      'leave-animation-class': animationClass === 'close' && animation,
+      'enter-animation-class': animationClass === 'open'  && animation,
+    }"
+  >
+    <div class="modal__header">
+      <h1 class="modal__title">{{ title }}</h1>
+      <button class="modal__close-button" (click)="closeModal()">×</button>
+    </div>
+
+    <!-- <div class="modal__header"></div> -->
+    <div class="modal__content">
+      <ng-container #dynamicContent></ng-container>
+    </div>
+  </div>
+</div>

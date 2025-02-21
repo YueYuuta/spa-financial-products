@@ -23,7 +23,7 @@ import { map, catchError, of } from 'rxjs';
   styleUrl: './form-product.component.scss',
 })
 export class FormProductComponent {
-  @Input() product!: Product;
+  @Input() product!: Product | null;
   private readonly _fb = inject(FormBuilder);
   private productService = inject(ProductService); // ✅ Servicio para validar ID existente
   formProduct: FormGroup = new FormGroup({});
@@ -120,7 +120,7 @@ export class FormProductComponent {
   private initFormUpdate() {
     this.formProduct = this._fb.group({
       id: [
-        { value: this.product.id, disabled: true },
+        { value: this.product?.id, disabled: true },
         [
           Validators.required,
           Validators.minLength(3),
@@ -128,7 +128,7 @@ export class FormProductComponent {
         ],
       ],
       name: [
-        this.product.name,
+        this.product?.name,
         [
           Validators.required,
           Validators.minLength(5),
@@ -136,20 +136,23 @@ export class FormProductComponent {
         ],
       ],
       description: [
-        this.product.description,
+        this.product?.description,
         [
           Validators.required,
           Validators.minLength(10),
           Validators.maxLength(200),
         ],
       ],
-      logo: [this.product.logo, [Validators.required]],
+      logo: [this.product?.logo, [Validators.required]],
       date_release: [
-        this.product.date_release,
+        this.toDateInputFormat(this.product?.date_release),
         [Validators.required, this.validateReleaseDate()],
       ],
       date_revision: [
-        { value: this.product.date_revision, disabled: true },
+        {
+          value: this.toDateInputFormat(this.product?.date_revision),
+          disabled: true,
+        },
         [Validators.required],
       ],
     });
@@ -159,17 +162,39 @@ export class FormProductComponent {
     });
   }
 
+  private toDateInputFormat(dateString: string | undefined | null): string {
+    if (!dateString) return '';
+
+    const date = new Date(dateString);
+    return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(
+      2,
+      '0'
+    )}-${String(date.getUTCDate()).padStart(2, '0')}`;
+  }
+
   send() {
     if (this.formProduct.valid) {
       const productData = this.formProduct.getRawValue();
+
       const formattedProduct: Product = {
         ...productData,
-        date_release: new Date(productData.date_release).toISOString(),
-        date_revision: new Date(productData.date_revision).toISOString(),
+        date_release: this.toUTCDateString(productData.date_release), // ✅ Convertir fecha antes de guardar
+        date_revision: this.toUTCDateString(productData.date_revision),
       };
 
+      console.log('🚀 Guardando producto:', formattedProduct); // 🔍 Verificar en la consola
       this.formSubmit.emit(formattedProduct);
     }
+  }
+
+  private toUTCDateString(date: string): string {
+    if (!date) return '';
+
+    // 📌 Convertir "YYYY-MM-DD" a una fecha sin ajuste de zona horaria
+    const [year, month, day] = date.split('-').map(Number);
+    const utcDate = new Date(Date.UTC(year, month - 1, day)); // ✅ Usar Date.UTC para evitar desfases
+
+    return utcDate.toISOString(); // ✅ Devuelve la fecha en formato ISO sin modificaciones
   }
 
   cancel() {
@@ -185,16 +210,15 @@ export class FormProductComponent {
       // ✅ Convertir la fecha seleccionada al formato correcto sin la hora
       const selectedDate = new Date(control.value + 'T00:00:00'); // 🔹 Forzar a medianoche para evitar desfases de zona horaria
       selectedDate.setHours(0, 0, 0, 0);
-
+      console.log(
+        '🚀 ~ FormProductComponent ~ return ~ selectedDate:',
+        selectedDate
+      );
       // ✅ Obtener la fecha actual sin la hora
       const today = new Date();
+
       today.setHours(0, 0, 0, 0);
-
-      console.log('🚀 ~ FormProductComponent ~ Comparando: ', {
-        selectedDate,
-        today,
-      });
-
+      console.log('🚀 ~ FormProductComponent ~ return ~ today:', today);
       return selectedDate >= today ? null : { invaliddate: true };
     };
   }

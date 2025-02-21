@@ -1,0 +1,16 @@
+<section class="delete-product">
+  <p class="delete-product__description">
+    Estas seguro de eliminar el producto {{ data.product.name }} ?
+  </p>
+  <footer class="delete-product__footer">
+    <app-button type="button" (btnClick)="cancel()" label="Cancelar">
+    </app-button>
+    <app-button
+      btnType="primary"
+      type="button"
+      label="Confirmar"
+      (btnClick)="submit()"
+    >
+    </app-button>
+  </footer>
+</section>

@@ -9,6 +9,12 @@ import { Observable } from 'rxjs';
 import { AlertComponent } from '../../components/molecules/alert/alert.component';
 import { SpinnerOverlayComponent } from '../../components/atoms/spinner-overlay/spinner-overlay.component';
 
+import {
+  selectAddProductSuccess,
+  selectAddProductError,
+  selectLoading,
+} from '../../store/selectors/product.selector';
+
 @Component({
   selector: 'app-create-product',
   standalone: true,
@@ -23,14 +29,12 @@ import { SpinnerOverlayComponent } from '../../components/atoms/spinner-overlay/
 })
 export class CreateProductComponent implements OnInit {
   private store = inject(Store);
-  loading$: Observable<boolean> = this.store.select(
-    (state) => state.products.loading
-  );
+  loading$: Observable<boolean> = this.store.select(selectLoading);
   errorMessage$: Observable<string | null> = this.store.select(
-    (state) => state.products.error
+    selectAddProductError
   );
   successMessage$: Observable<string | null> = this.store.select(
-    (state) => state.products.success
+    selectAddProductSuccess
   );
 
   ngOnInit(): void {}

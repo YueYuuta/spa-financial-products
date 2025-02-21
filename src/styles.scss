@@ -50,4 +50,14 @@ body {
   --btn-secondary-text: #2d3748; // 🎨 Azul oscuro (para texto en el botón secundario)
 
   --btn-disabled-opacity: 0.5; // 🎨 Opacidad cuando está deshabilitado
+
+  --modal-background: #ffffff;
+  --modal-box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  --close-button-color: rgba(0, 0, 0, 0.4);
+
+  --blur: rgba(0, 0, 0, 0.3);
+
+  --scrollbar: rgba(255, 255, 255, 0.1);
+  --scrollbar-thumb: rgba(0, 0, 0, 0.4);
+  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.5);
 }

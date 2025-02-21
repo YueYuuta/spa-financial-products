@@ -6,13 +6,22 @@
 </ng-container>
 }
 
-<input
-  type="text"
-  [(ngModel)]="searchTerm"
-  (input)="filterRows()"
-  placeholder="Buscar..."
-  class="search-input"
-/>
+<header class="header-product-list">
+  <input
+    type="text"
+    [(ngModel)]="searchTerm"
+    (input)="filterRows()"
+    placeholder="Buscar..."
+    class="search-input"
+  />
+
+  <app-button
+    type="button"
+    [btnType]="'primary'"
+    (btnClick)="create()"
+    label="Agregar"
+  ></app-button>
+</header>
 
 <app-data-table
   [headers]="headers"

@@ -5,9 +5,17 @@ import { Product } from '../../interfaces';
 export interface ProductState {
   products: Product[];
   loading: boolean;
+  loadingSelect: boolean;
   error: string | null;
   success: string | null;
   selectedProduct: Product | null;
+  addProductSuccess: string | null;
+  updateProductSuccess: string | null;
+  deleteProductSuccess: string | null;
+  addProductError: string | null;
+  updateProductError: string | null;
+  deleteProductError: string | null;
+  selectedProductId: Product | null;
 }
 
 const initialState: ProductState = {
@@ -16,6 +24,14 @@ const initialState: ProductState = {
   error: null,
   success: null,
   selectedProduct: null,
+  addProductSuccess: null,
+  updateProductSuccess: null,
+  deleteProductSuccess: null,
+  addProductError: null,
+  updateProductError: null,
+  deleteProductError: null,
+  loadingSelect: false,
+  selectedProductId: null,
 };
 
 export const productReducer = createReducer(
@@ -23,21 +39,20 @@ export const productReducer = createReducer(
   // ✅ Comienza la verificación del ID
   on(ProductActions.selectProductById, (state) => ({
     ...state,
-    loading: true, // 🔄 Activamos el estado de carga
+    loadingSelect: true, // 🔄 Activamos el estado de carga
     error: null,
   })),
   on(ProductActions.selectProductSuccess, (state, { product }) => ({
     ...state,
     selectedProduct: product,
-    loading: false,
+    loadingSelect: false,
     error: null,
   })),
 
-  // ❌ Si el ID no existe o el producto no está en el Store, limpiamos el estado
   on(ProductActions.selectProductFailure, (state, { error }) => ({
     ...state,
     selectedProduct: null,
-    loading: false,
+    loadingSelect: false,
     error,
   })),
 
@@ -65,62 +80,81 @@ export const productReducer = createReducer(
   on(ProductActions.addProduct, (state) => ({
     ...state,
     loading: true,
-    error: null,
-    success: null,
+    addProductError: null,
+    addProductSuccess: null,
   })),
   on(ProductActions.addProductSuccess, (state, { product }) => ({
     ...state,
     products: [...state.products, product],
     loading: false,
-    success: 'Producto agregado correctamente',
-    error: null,
+    addProductSuccess: 'Producto agregado correctamente',
+    addProductError: null,
   })),
   on(ProductActions.addProductFailure, (state, { error }) => ({
     ...state,
     loading: false,
-    error,
-    success: null,
+    addProductError: error,
+    addProductSuccess: null,
   })),
 
   // ✅ Actualizando productos
   on(ProductActions.updateProduct, (state) => ({
     ...state,
     loading: true,
-    error: null,
-    success: null,
+    updateProductError: null,
+    updateProductSuccess: null,
   })),
   on(ProductActions.updateProductSuccess, (state, { product }) => ({
     ...state,
     products: state.products.map((p) => (p.id === product.id ? product : p)),
     loading: false,
-    success: 'Producto actualizado correctamente',
-    error: null,
+    updateProductSuccess: 'Producto actualizado correctamente',
+    updateProductError: null,
   })),
   on(ProductActions.updateProductFailure, (state, { error }) => ({
     ...state,
     loading: false,
-    error,
-    success: null,
+    updateProductError: error,
+    updateProductSuccess: null,
   })),
 
   // ✅ Eliminando productos
   on(ProductActions.deleteProduct, (state) => ({
     ...state,
     loading: true,
-    error: null,
-    success: null,
+    deleteProductError: null,
+    deleteProductSuccess: null,
   })),
   on(ProductActions.deleteProductSuccess, (state, { id }) => ({
     ...state,
     products: state.products.filter((p) => p.id !== id),
     loading: false,
-    success: 'Producto eliminado correctamente',
-    error: null,
+    deleteProductSuccess: 'Producto eliminado correctamente',
+    deleteProductError: null,
+    selectedProductId: null,
   })),
   on(ProductActions.deleteProductFailure, (state, { error }) => ({
     ...state,
     loading: false,
+    deleteProductError: error,
+    deleteProductSuccess: null,
+  })),
+  // ✅ Comienza la verificación del ID antes de eliminar
+  on(ProductActions.selectProductToDelete, (state) => ({
+    ...state,
+    loading: true,
+    error: null,
+  })),
+  on(ProductActions.selectProductToDeleteSuccess, (state, { product }) => ({
+    ...state,
+    selectedProductId: product,
+    loading: false,
+    error: null,
+  })),
+  on(ProductActions.selectProductToDeleteFailure, (state, { error }) => ({
+    ...state,
+    selectedProduct: null,
+    loading: false,
     error,
-    success: null,
   }))
 );

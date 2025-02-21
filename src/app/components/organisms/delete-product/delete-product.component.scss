@@ -1,0 +1,17 @@
+.delete-product {
+  &__description {
+    margin: 0;
+    padding: 1rem;
+  }
+  &__footer {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    padding: 1.5rem;
+    border-top-width: 1px;
+    border-color: #dbdbdb;
+  }
+}
+app-button {
+  flex: 1;
+}

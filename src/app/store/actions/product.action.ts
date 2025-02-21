@@ -84,3 +84,21 @@ export const selectProductFailure = createAction(
   '[Product] Select Product Failure',
   props<{ error: string }>()
 );
+
+// ✅ Acción para verificar si el producto existe antes de eliminar
+export const selectProductToDelete = createAction(
+  '[Product] Select Product To Delete',
+  props<{ id: string }>()
+);
+
+// ✅ Si la verificación es exitosa, actualizamos el store con el producto seleccionado
+export const selectProductToDeleteSuccess = createAction(
+  '[Product] Select Product To Delete Success',
+  props<{ product: Product }>()
+);
+
+// ❌ Si el ID no existe, mostramos error
+export const selectProductToDeleteFailure = createAction(
+  '[Product] Select Product To Delete Failure',
+  props<{ error: string }>()
+);
