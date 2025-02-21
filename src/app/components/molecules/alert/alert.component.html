@@ -1,0 +1,36 @@
+<div *ngIf="show" class="alert" [ngClass]="'alert--' + type">
+  <span class="alert__icon">
+    <ng-container [ngSwitch]="type">
+      <svg
+        *ngSwitchCase="'success'"
+        class="icon icon--success"
+        viewBox="0 0 24 24"
+      >
+        <path d="M9 17l-5-5 1.41-1.41L9 14.17l8.59-8.59L19 7z"></path>
+      </svg>
+      <svg *ngSwitchCase="'error'" class="icon icon--error" viewBox="0 0 24 24">
+        <path
+          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2zm0 8h-2v2h2z"
+        ></path>
+      </svg>
+      <svg *ngSwitchCase="'info'" class="icon icon--info" viewBox="0 0 24 24">
+        <path
+          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+        ></path>
+      </svg>
+      <svg
+        *ngSwitchCase="'warning'"
+        class="icon icon--warning"
+        viewBox="0 0 24 24"
+      >
+        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"></path>
+      </svg>
+    </ng-container>
+  </span>
+  <span class="alert__message">{{ message }}</span>
+
+  <!-- ✅ Botón para cerrar manualmente -->
+  <button *ngIf="dismissible" class="alert__close-btn" (click)="closeAlert()">
+    ✖
+  </button>
+</div>

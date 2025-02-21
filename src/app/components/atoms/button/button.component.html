@@ -1,0 +1,8 @@
+<button
+  class="btn btn--launch {{ 'btn__' + btnType }}"
+  [type]="type"
+  (click)="onBtnClick()"
+  [disabled]="disabled"
+>
+  <span class="btn__text">{{ label }}</span>
+</button>

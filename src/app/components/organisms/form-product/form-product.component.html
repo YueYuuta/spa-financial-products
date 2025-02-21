@@ -1,0 +1,54 @@
+<!-- parent.component.html -->
+<form class="form" [formGroup]="formProduct" (ngSubmit)="send()">
+  <div *ngIf="title" class="form__header">
+    <h1 class="form__header-title">{{ title }}</h1>
+  </div>
+  <div class="form__body">
+    <app-input
+      label="ID"
+      placeholder="Ingrese el identificador del producto."
+      formControlName="id"
+      [customErrorMessages]="errorMessages.id"
+    ></app-input>
+    <app-input
+      label="Nombre"
+      placeholder="Ingrese el nombre del producto."
+      formControlName="name"
+      [customErrorMessages]="errorMessages.name"
+    ></app-input>
+    <app-input
+      label="Descripción"
+      placeholder="Ingrese la descripción del producto."
+      formControlName="description"
+      [customErrorMessages]="errorMessages.description"
+    ></app-input>
+    <app-input
+      label="Logo"
+      placeholder="Ingrese logo del producto."
+      formControlName="logo"
+      [customErrorMessages]="errorMessages.logo"
+    ></app-input>
+    <app-input
+      label="Fecha de liberación"
+      placeholder="Ingrese la fecha de liberación."
+      formControlName="date_release"
+      type="date"
+      [customErrorMessages]="errorMessages.date_release"
+    ></app-input>
+    <app-input
+      label="Fecha de Revisión"
+      placeholder="Ingrese la fecha de la revisión."
+      formControlName="date_revision"
+      [customErrorMessages]="errorMessages.date_revision"
+      type="date"
+    ></app-input>
+  </div>
+  <div class="form__footer">
+    <div class="form__footer-container">
+      <app-button type="button" (btnClick)="cancel()" label="Reiniciar">
+      </app-button>
+      <app-button btnType="primary" [disabled]="formProduct.invalid">
+      </app-button>
+    </div>
+  </div>
+</form>

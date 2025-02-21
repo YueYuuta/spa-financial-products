@@ -19,18 +19,18 @@
 
     <button
       (click)="changePage(currentPage + 1)"
-      [disabled]="currentPage === totalPages"
+      [disabled]="currentPage === totalPages || totalItems === 0"
     >
       ›
     </button>
     <button
       (click)="changePage(totalPages)"
-      [disabled]="currentPage === totalPages"
+      [disabled]="currentPage === totalPages || totalItems === 0"
     >
       »
     </button>
 
-    <select (change)="onPageSizeChange($event)">
+    <select [disabled]="totalItems === 0" (change)="onPageSizeChange($event)">
       <option *ngFor="let option of pageSizeOptions" [value]="option">
         {{ option }}
       </option>

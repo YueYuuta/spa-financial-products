@@ -1,3 +1,11 @@
+<app-spinner-overlay [show]="loading$ | async"></app-spinner-overlay>
+
+@defer (when error$ | async) {
+<ng-container *ngIf="error$ | async as error">
+  <app-alert type="error" [message]="error" [dismissible]="true"></app-alert>
+</ng-container>
+}
+
 <input
   type="text"
   [(ngModel)]="searchTerm"

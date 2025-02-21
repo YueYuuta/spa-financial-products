@@ -8,10 +8,46 @@
 :after,
 :before {
   box-sizing: border-box;
+  border: 0 solid #e5e7eb;
 }
 
 body {
   font-family: "Inter", sans-serif;
   margin: 0;
   padding: 0;
+  background-color: #f4f8fb;
+}
+
+:root {
+  // 🎨 COLORES BASE
+  --input-background: #fff; // Celeste agua bajito, fondo suave
+  --input-border-color: #94999c; // Azul grisáceo, borde neutro
+  --input-select-color: #4a90e2; // Azul vibrante, selección activa
+  --input-placeholder-color: #a0aec0; // Gris claro para placeholder
+  --text-primary-color: #2d3748; // Azul oscuro, texto principal
+  --label-color: #4a5568; // Azul grisáceo, etiquetas
+  --disabled-background: #e2e8f0; // Gris más oscuro para fondo deshabilitado
+  --disabled-border-color: #a0aec0; // Gris claro para borde deshabilitado
+  --disabled-text-color: #718096; // Gris oscuro para texto deshabilitado
+
+  // 🎯 VALIDACIONES
+  --danger-color: #e53e3e; // Rojo intenso, error
+  --succes-color: #38a169; // Verde intenso, éxito
+
+  // ⚡ EFECTOS Y TRANSICIONES
+  --transition-normal: 0.3s ease-in-out;
+  --small-font-size: 12px;
+  --normal-font-size: 14px;
+
+  --smaller-font-size: 0.75rem;
+  --small-font-size: 0.813rem;
+
+  // 🎨 COLORES BASE PARA BOTONES
+  --btn-primary-background: #ecd672; // 🎨 Amarillo pastel (como en la imagen)
+  --btn-primary-text: #5c5c5c; // 🎨 Texto gris oscuro (para contraste en amarillo)
+
+  --btn-secondary-background: #e6eaf1; // 🎨 Gris azulado suave (como en la imagen)
+  --btn-secondary-text: #2d3748; // 🎨 Azul oscuro (para texto en el botón secundario)
+
+  --btn-disabled-opacity: 0.5; // 🎨 Opacidad cuando está deshabilitado
 }

@@ -1,24 +1,92 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { catchError, filter, map, mergeMap, of, withLatestFrom } from 'rxjs';
+import {
+  catchError,
+  filter,
+  map,
+  mergeMap,
+  of,
+  tap,
+  withLatestFrom,
+} from 'rxjs';
 import * as ProductActions from '../actions/product.action';
 import { ProductService } from '../../services/product.service';
 import { select, Store } from '@ngrx/store';
 import { Product } from '../models';
+import { selectProductById } from '../selectors/product.selector';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class ProductEffects {
-  private actions$ = inject(Actions); // ✅ Inyección moderna en Angular 18
+  private actions$ = inject(Actions);
   private store = inject(
     Store<{ products: { products: Product[]; isEmpty: boolean } }>
   );
-  private productService = inject(ProductService); // ✅ También inyectamos el servicio
+  private productService = inject(ProductService);
+  private router = inject(Router);
+
+  selectProductById$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ProductActions.selectProductById),
+      mergeMap(({ id }) =>
+        this.productService.verifyProduct(id).pipe(
+          mergeMap((exists) => {
+            if (exists) {
+              console.log(
+                `✅ ID ${id} existe en la base de datos, buscando en el Store...`
+              );
+
+              return this.store.select(selectProductById(id)).pipe(
+                map((product) => {
+                  if (product) {
+                    console.log('✅ Producto encontrado en el Store:', product);
+                    return ProductActions.selectProductSuccess({ product });
+                  } else {
+                    console.log('❌ Producto no encontrado en el Store.');
+                    return ProductActions.selectProductFailure({
+                      error: 'El producto no está disponible en el sistema.',
+                    });
+                  }
+                })
+              );
+            } else {
+              console.log(`❌ El ID ${id} no existe en la base de datos.`);
+              return of(
+                ProductActions.selectProductFailure({
+                  error: 'El ID no existe.',
+                })
+              );
+            }
+          }),
+          catchError(() =>
+            of(
+              ProductActions.selectProductFailure({
+                error: 'Error verificando el ID.',
+              })
+            )
+          )
+        )
+      )
+    )
+  );
+
+  navigateToEdit$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(ProductActions.selectProductSuccess),
+        tap(({ product }) => {
+          console.log('✅ Navegando a la edición de:', product.id);
+          this.router.navigate(['/financial-products/update']);
+        })
+      ),
+    { dispatch: false }
+  );
 
   loadProducts$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ProductActions.loadProducts),
-      withLatestFrom(this.store.pipe(select((state) => state.products))), // ✅ Obtenemos todo el estado de `products`
-      filter(([_, state]) => !state.isEmpty), // ✅ Si `isEmpty` es `true`, NO volvemos a llamar la API
+      withLatestFrom(this.store.pipe(select((state) => state.products))),
+      filter(([_, state]) => !state.isEmpty),
       mergeMap(([_, state]) => {
         if (state.products.length > 0) {
           return of(
@@ -28,10 +96,7 @@ export class ProductEffects {
           return this.productService.getProducts().pipe(
             map((response) => {
               if (response.data.length === 0) {
-                console.warn(
-                  '⚠️ La API devolvió un array vacío. Evitando bucle.'
-                );
-                return ProductActions.loadProductsSuccess({ products: [] }); // ✅ Evita el bucle infinito
+                return ProductActions.loadProductsSuccess({ products: [] });
               }
               return ProductActions.loadProductsSuccess({
                 products: response.data,

@@ -67,3 +67,20 @@ export const verifyProductFailure = createAction(
   '[Product] Verify Product Failure',
   props<{ error: string }>()
 );
+
+export const selectProductById = createAction(
+  '[Product] Select Product By ID',
+  props<{ id: string }>()
+);
+
+// ✅ Acción cuando el producto se encuentra en el Store
+export const selectProductSuccess = createAction(
+  '[Product] Select Product Success',
+  props<{ product: Product }>()
+);
+
+// ❌ Acción cuando el ID no existe o el producto no está en el Store
+export const selectProductFailure = createAction(
+  '[Product] Select Product Failure',
+  props<{ error: string }>()
+);

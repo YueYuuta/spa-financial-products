@@ -14,8 +14,13 @@ $img-sizes: (
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   border: 1px solid #ddd;
   position: relative;
+
+  &__primary-text {
+    font-size: 12px;
+  }
   &__container {
     overflow-x: auto;
+    min-height: 6.25rem;
     /* Personalización de la barra de scroll */
     &::-webkit-scrollbar {
       height: 6px; /* Grosor de la barra horizontal */

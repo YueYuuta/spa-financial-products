@@ -59,10 +59,15 @@
               />
               } @else {
               <div class="data-table__cell-content">
-                <strong class="data-table__primary-text">{{
+                @if (isDate(column.primaryText)) {
+                <span class="data-table__primary-text">{{
+                  column.primaryText | date : "yyyy-MM-dd"
+                }}</span>
+                }@else{
+                <span class="data-table__primary-text">{{
                   column.primaryText
-                }}</strong>
-                @if (column.secundaryText) {
+                }}</span>
+                } @if (column.secundaryText) {
                 <p class="data-table__secondary-text">
                   {{ column.secundaryText }}
                 </p>

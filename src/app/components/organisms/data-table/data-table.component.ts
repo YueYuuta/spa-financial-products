@@ -47,6 +47,14 @@ export class DataTableComponent implements OnInit {
     this.processRows();
   }
 
+  isDate(value: any): boolean {
+    if (!value) return false;
+
+    const date = new Date(value);
+
+    return !isNaN(date.getTime());
+  }
+
   private processRows() {
     let sortedRows = [...this.rows].map((row) => ({
       ...row,

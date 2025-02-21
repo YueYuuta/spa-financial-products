@@ -1,19 +1,31 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Product, TableAction, TableHeader, TableRow } from '../../interfaces';
-import { ProductService } from '../../services/product.service';
 import { DataTableComponent } from '../../components/organisms/data-table/data-table.component';
-import { productsMock } from '../../mock/data';
 import { FormsModule } from '@angular/forms';
-import { debounceTime, Subject } from 'rxjs';
+import { debounceTime, Observable, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as ProductActions from '../../store/actions/product.action';
+import {
+  selectAllProducts,
+  selectLoading,
+  selectError,
+} from '../../store/selectors/product.selector';
+import { SpinnerOverlayComponent } from '../../components/atoms/spinner-overlay/spinner-overlay.component';
+import { CommonModule } from '@angular/common';
+import { AlertComponent } from '../../components/molecules/alert/alert.component';
 
 @Component({
   selector: 'app-product-list',
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss'],
   standalone: true,
-  imports: [DataTableComponent, FormsModule],
+  imports: [
+    DataTableComponent,
+    FormsModule,
+    SpinnerOverlayComponent,
+    CommonModule,
+    AlertComponent,
+  ],
 })
 export class ProductListComponent implements OnInit {
   private store = inject(
@@ -23,7 +35,9 @@ export class ProductListComponent implements OnInit {
   );
   products$ = this.store.select((state) => state.products.products);
   isEmpty$ = this.store.select((state) => state.products.isEmpty);
-  error$ = this.store.select((state) => state.products.error);
+
+  loading$: Observable<boolean> = this.store.select(selectLoading);
+  error$: Observable<string | null> = this.store.select(selectError);
   isLoading = signal(true);
   searchTerm = '';
   searchSubject = new Subject<string>();
@@ -51,7 +65,7 @@ export class ProductListComponent implements OnInit {
 
   rows: TableRow[] = [];
 
-  constructor(private productService: ProductService) {}
+  constructor() {}
 
   ngOnInit() {
     this.fetchProducts();
@@ -82,29 +96,15 @@ export class ProductListComponent implements OnInit {
   }
 
   private fetchProducts(): void {
-    // this.productService.getProducts().subscribe((products) => {
-    //   console.log(
-    //     '🚀 ~ ProductListComponent ~ this.productService.getProducts ~ products:',
-    //     products
-    //   );
-    //   this.rows = productsMock.map((product) =>
-    //     this.mapProductToTableRow(product)
-    //   );
-    //   this.filteredRows = [...this.rows];
-    // });
-
-    this.products$.subscribe((products) => {
+    this.products$.subscribe((products: Product[]) => {
       if (products.length === 0) {
-        console.log(
-          '🚀 ~ ProductListComponent ~ this.products$.subscribe ~ products:',
-          products
-        );
-        // Si el store está vacío, intentamos cargar desde la API
         this.store.dispatch(ProductActions.loadProducts());
       } else {
-        // Si ya hay productos, marcamos como listo
+        this.rows = products.map((product) =>
+          this.mapProductToTableRow(product)
+        );
         this.isLoading.set(false);
-        this.filteredRows = [...products];
+        this.filteredRows = [...this.rows];
       }
     });
   }
@@ -152,6 +152,11 @@ export class ProductListComponent implements OnInit {
   }
 
   handleAction(event: { action: string; row: TableRow }) {
+    if (event.action === 'Editar') {
+      this.store.dispatch(
+        ProductActions.selectProductById({ id: event.row.id })
+      );
+    }
     console.log(`Acción ejecutada: ${event.action}`, event.row);
   }
 }

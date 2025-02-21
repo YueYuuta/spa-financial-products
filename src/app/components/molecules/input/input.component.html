@@ -1,0 +1,40 @@
+<div class="form-input">
+  <label
+    *ngIf="label && version === 'v2'"
+    class="form-input__label--v2"
+    for="email"
+    >{{ label }}</label
+  >
+  <div
+    class="form-input__container"
+    [ngClass]="{
+      'form-input__container--default': !control.touched && !control.dirty,
+      'form-input__container--invalid':
+        (control.touched || control.dirty) && control.invalid,
+      'form-input__container--valid':
+        (control.touched || control.dirty) && control.valid,
+      'form-input__container--disabled': control.disabled
+    }"
+  >
+    <label
+      *ngIf="label && version === 'v1'"
+      class="form-input__label"
+      for="email"
+      >{{ label }}</label
+    >
+    <input
+      class="form-input__field"
+      [type]="type"
+      [id]="inputId"
+      [formControl]="control"
+      [placeholder]="placeholder"
+    />
+  </div>
+
+  <app-validation-errors
+    *ngIf="control && control.invalid && (control.touched || control.dirty)"
+    [customErrorMessages]="customErrorMessages"
+    [errors]="control.errors"
+  >
+  </app-validation-errors>
+</div>
