@@ -24,6 +24,16 @@ export const selectError = createSelector(
   (state) => state.error
 );
 
+export const SelectDeleteProductSuccess = createSelector(
+  selectProductState,
+  (state) => state.deleteProductSuccess
+);
+
+export const SelectDeleteProductError = createSelector(
+  selectProductState,
+  (state) => state.deleteProductError
+);
+
 // ✅ Selector de productos
 export const selectAllProducts = createSelector(
   selectProductState,

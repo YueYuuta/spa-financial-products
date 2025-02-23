@@ -1,18 +1,25 @@
-<!-- <app-spinner-overlay [show]="loading$ | async"></app-spinner-overlay> -->
-
-<!-- @defer (when error$ | async) {
-<ng-container *ngIf="error$ | async as error">
+<app-spinner-overlay [show]="loading$ | async"></app-spinner-overlay>
+{{ loading$ | async }}
+@defer (when errorDeleteProduct$ | async) {
+<ng-container *ngIf="errorDeleteProduct$ | async as error">
   <app-alert type="error" [message]="error" [dismissible]="true"></app-alert>
 </ng-container>
-} -->
+} @defer (when successDeleteProduct$ | async) {
+<ng-container *ngIf="successDeleteProduct$ | async as success">
+  <app-alert
+    type="success"
+    [message]="success"
+    [dismissible]="true"
+  ></app-alert>
+</ng-container>
+}
 
 <header class="header-product-list">
   <input
     type="text"
-    [(ngModel)]="searchTerm"
-    (input)="filterRows()"
     placeholder="Buscar..."
     class="search-input"
+    [formControl]="searchControl"
   />
 
   <app-button
@@ -22,12 +29,13 @@
     label="Agregar"
   ></app-button>
 </header>
-
+@if (filteredRows$ | async ; as products) {
 <app-data-table
   [headers]="headers"
-  [rows]="filteredRows"
+  [rows]="products"
   [actions]="actions"
   [showPagination]="true"
   (clickAction)="handleAction($event)"
 >
 </app-data-table>
+}

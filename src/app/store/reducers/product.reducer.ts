@@ -42,6 +42,12 @@ export const productReducer = createReducer(
     loadingSelect: true, // 🔄 Activamos el estado de carga
     error: null,
   })),
+
+  on(ProductActions.verifyProduct, (state) => ({
+    ...state,
+    loadingSelect: true, // 🔄 Activamos el estado de carga
+    error: null,
+  })),
   on(ProductActions.selectProductSuccess, (state, { product }) => ({
     ...state,
     selectedProduct: product,
