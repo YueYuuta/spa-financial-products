@@ -64,6 +64,7 @@ export class ProductNgrxService implements ProductStore {
         if (products.length === 0) {
           this._store.dispatch(ProductActions.loadProducts());
         }
+        this._store.dispatch(ProductActions.resetMessage());
       })
     );
   }

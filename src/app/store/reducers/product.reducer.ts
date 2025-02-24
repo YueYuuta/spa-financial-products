@@ -69,6 +69,12 @@ export const productReducer = createReducer(
     loading: true,
     error: null,
     success: null, // Resetear mensajes previos
+    addProductError: null,
+    addProductSuccess: null,
+    deleteProductError: null,
+    deleteProductSuccess: null,
+    updateProductError: null,
+    updateProductSuccess: null,
   })),
   on(ProductActions.loadProductsSuccess, (state, { products }) => ({
     ...state,
@@ -84,9 +90,28 @@ export const productReducer = createReducer(
     success: null,
   })),
 
+  on(ProductActions.resetMessage, (state) => ({
+    ...state,
+
+    error: null,
+    success: null, // Resetear mensajes previos
+    addProductError: null,
+    addProductSuccess: null,
+    deleteProductError: null,
+    deleteProductSuccess: null,
+    updateProductError: null,
+    updateProductSuccess: null,
+  })),
+
   on(ProductActions.emptyProduct, (state) => ({
     ...state,
     loading: false,
+    addProductError: null,
+    addProductSuccess: null,
+    deleteProductError: null,
+    deleteProductSuccess: null,
+    updateProductError: null,
+    updateProductSuccess: null,
   })),
 
   on(ProductActions.selectProductId, (state, { id }) => ({

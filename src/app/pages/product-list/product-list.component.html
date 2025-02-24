@@ -1,7 +1,7 @@
 <app-spinner-overlay [show]="loading$ | async"></app-spinner-overlay>
 @defer (when errorDeleteProduct$ | async) {
 <ng-container *ngIf="errorDeleteProduct$ | async as error">
-  <app-alert type="error" [message]="error" [dismissible]="true"></app-alert>
+  <app-alert type="error" [message]="error" [dismissible]="false"></app-alert>
 </ng-container>
 } @defer (when successDeleteProduct$ | async) {
 <ng-container *ngIf="successDeleteProduct$ | async as success">

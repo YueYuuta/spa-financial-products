@@ -13,6 +13,8 @@ export const loadProductsIsEmpty = createAction(
   props<{ isEmpty: boolean }>()
 );
 
+export const resetMessage = createAction('[Product] resetMessage');
+
 export const loadProductsFailure = createAction(
   '[Product] Load Products Failure',
   props<{ error: string }>()

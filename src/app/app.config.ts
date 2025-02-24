@@ -24,7 +24,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    { provide: PRODUCT_STORE, useClass: ProductSignalService },
+    { provide: PRODUCT_STORE, useClass: ProductNgrxService },
     provideHttpClient(withInterceptorsFromDi()),
 
     { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptor, multi: true },
