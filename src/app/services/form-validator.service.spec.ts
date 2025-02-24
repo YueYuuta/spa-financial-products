@@ -54,6 +54,21 @@ describe('FormValidatorService', () => {
       });
     });
 
+    it('Debe validar el control', (done) => {
+      productServiceMock.verifyProduct.mockReturnValue(of(false));
+
+      const validator = service.validateIdExists();
+      const control = { value: undefined } as AbstractControl;
+
+      const validationResult = validator(
+        control
+      ) as Observable<ValidationErrors | null>;
+      validationResult.subscribe((result) => {
+        expect(result).toBeNull();
+        done();
+      });
+    });
+
     it('Debe retornar `null` si hay un error en la API', (done) => {
       productServiceMock.verifyProduct.mockReturnValue(
         throwError(() => new Error('API Error'))
