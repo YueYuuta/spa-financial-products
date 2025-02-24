@@ -18,12 +18,13 @@ import { ProductEffects } from './store/affects/product.effect';
 import { HttpErrorInterceptor } from './interceptors/http-error.interceptor';
 import { PRODUCT_STORE } from './services/product.store.interface';
 import { ProductNgrxService } from './services/product.ngrx.service';
+import { ProductSignalService } from './services/product.signal.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    { provide: PRODUCT_STORE, useClass: ProductNgrxService },
+    { provide: PRODUCT_STORE, useClass: ProductSignalService },
     provideHttpClient(withInterceptorsFromDi()),
 
     { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptor, multi: true },
