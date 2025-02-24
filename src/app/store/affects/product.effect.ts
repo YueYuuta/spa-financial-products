@@ -88,9 +88,14 @@ export class ProductEffects {
           return EMPTY;
         }
         return this.productService.getProducts().pipe(
-          map((products) =>
-            ProductActions.loadProductsSuccess({ products: products.data })
-          ), // 🔹 Si la API responde bien
+          map((products) => {
+            if (products.data.length === 0) {
+              return ProductActions.emptyProduct();
+            }
+            return ProductActions.loadProductsSuccess({
+              products: products.data,
+            });
+          }), // 🔹 Si la API responde bien
           catchError(
             (error) =>
               of(ProductActions.loadProductsFailure({ error: error.message })) // 🔹 Si hay un error
@@ -122,33 +127,6 @@ export class ProductEffects {
     )
   );
 
-  // loadProducts$ = createEffect(() =>
-  //   this.actions$.pipe(
-  //     ofType(ProductActions.loadProducts),
-  //     withLatestFrom(this.store.pipe(select((state) => state.products))),
-  //     // filter(([_, state]) => !state.isEmpty),
-  //     mergeMap(([_, state]) => {
-  //       if (state.products.length > 0) {
-  //         return of();
-  //         // ProductActions.loadProductsSuccess({ products: state.products })
-  //       } else {
-  //         return this.productService.getProducts().pipe(
-  //           map((response) => {
-  //             if (response.data.length === 0) {
-  //               return ProductActions.loadProductsSuccess({ products: [] });
-  //             }
-  //             return ProductActions.loadProductsSuccess({
-  //               products: response.data,
-  //             });
-  //           }),
-  //           catchError((error) =>
-  //             of(ProductActions.loadProductsFailure({ error: error.message }))
-  //           )
-  //         );
-  //       }
-  //     })
-  //   )
-  // );
   addProduct$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ProductActions.addProduct),

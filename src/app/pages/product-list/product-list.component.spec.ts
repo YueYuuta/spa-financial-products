@@ -1,187 +1,180 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ProductListComponent } from './product-list.component';
-import { Store } from '@ngrx/store';
+import { ProductApplicationService } from '../../services/product.aplication.service';
 import { ModalService } from '../../lib/modal/services';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
-import * as ProductActions from '../../store/actions/product.action';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { SpinnerOverlayComponent } from '../../components/atoms/spinner-overlay/spinner-overlay.component';
-import { AlertComponent } from '../../components/molecules/alert/alert.component';
-import { ButtonComponent } from '../../components/atoms/button/button.component';
+import { of, Subject } from 'rxjs';
 import { DeleteProductComponent } from '../../components/organisms/delete-product/delete-product.component';
-import { TableRow } from '../../interfaces';
+import { TableRow, TableColumn } from '../../interfaces';
 
 describe('ProductListComponent', () => {
   let component: ProductListComponent;
   let fixture: ComponentFixture<ProductListComponent>;
-  let store: Store;
+  let productApplicationService: ProductApplicationService;
   let modalService: ModalService;
   let router: Router;
 
-  const mockStore = {
-    select: jest.fn().mockReturnValue(of([])),
-    dispatch: jest.fn(),
+  const mockProduct = {
+    id: '1',
+    name: 'Producto de prueba',
+    description: 'Descripción de prueba',
+    logo: 'https://example.com/logo.png',
+    date_release: '2023-01-01',
+    date_revision: '2025-01-01',
   };
 
-  const mockModalService = {
-    show: jest.fn(),
-    hide: jest.fn(),
+  const mockTableRow: TableRow = {
+    id: '1',
+    status: 'success',
+    label: 'Producto de prueba',
+    columns: [
+      {
+        headerId: 'name',
+        primaryText: 'Producto de prueba',
+        secundaryText: 'Descripción de prueba',
+        avatar: {
+          type: 'image',
+          src: 'https://example.com/logo.png',
+          size: 'md',
+        },
+      },
+    ],
   };
+  let formSubmitSubject: Subject<void>;
+  let formCancelSubject: Subject<void>;
+
+  const mockProductApplicationService = {
+    getLoading: jest.fn().mockReturnValue(of(false)),
+    getDeleteErrorUi: jest.fn().mockReturnValue(of(null)),
+    getDeleteSuccessUi: jest.fn().mockReturnValue(of(null)),
+    filterProducts: jest.fn().mockReturnValue(of([mockProduct])),
+    selectProductId: jest.fn(),
+    deleteProduct: jest.fn(),
+  };
+
+  // const mockModalService = {
+  //   show: jest.fn().mockReturnValue({
+  //     modalRef: { hide: jest.fn() },
+  //     contentRef: {
+  //       instance: {
+  //         formSubmit: formSubmitSubject.asObservable(),
+  //         formCancel: formCancelSubject.asObservable(),
+  //       },
+  //     },
+  //   }),
+  //   hide: jest.fn(),
+  // };
 
   const mockRouter = {
     navigate: jest.fn(),
   };
 
   beforeEach(async () => {
+    formSubmitSubject = new Subject<void>();
+    formCancelSubject = new Subject<void>();
+
     await TestBed.configureTestingModule({
-      declarations: [],
-      imports: [
-        CommonModule,
-        FormsModule,
-        SpinnerOverlayComponent,
-        AlertComponent,
-        ButtonComponent,
-        ProductListComponent,
-      ],
+      imports: [ProductListComponent],
       providers: [
-        { provide: Store, useValue: mockStore },
-        { provide: ModalService, useValue: mockModalService },
+        {
+          provide: ProductApplicationService,
+          useValue: mockProductApplicationService,
+        },
+        {
+          provide: ModalService,
+          useValue: {
+            show: jest.fn().mockReturnValue({
+              modalRef: { hide: jest.fn() },
+              contentRef: {
+                instance: {
+                  formSubmit: formSubmitSubject.asObservable(),
+                  formCancel: formCancelSubject.asObservable(),
+                },
+              },
+            }),
+            hide: jest.fn(),
+          },
+        },
         { provide: Router, useValue: mockRouter },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProductListComponent);
     component = fixture.componentInstance;
-    store = TestBed.inject(Store);
+    productApplicationService = TestBed.inject(ProductApplicationService);
     modalService = TestBed.inject(ModalService);
     router = TestBed.inject(Router);
     fixture.detectChanges();
   });
 
-  it('should create the component', () => {
+  it('Debe crearse correctamente', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should navigate to create page when create is called', () => {
+  it('Debe suscribirse al control de búsqueda y filtrar productos', (done) => {
+    component.filteredRows$.subscribe((products) => {
+      expect(products).toEqual([mockProduct]);
+      done();
+    });
+  });
+
+  it('Debe navegar a la ruta de creación al ejecutar create()', () => {
     component.create();
     expect(router.navigate).toHaveBeenCalledWith([
       '/financial-products/create',
     ]);
   });
 
-  it('should call filterRows when search input is triggered', () => {
-    const searchInputEvent = { target: { value: 'Test' } };
-    jest.spyOn(component, 'filterRows');
-    component.onSearchInput(searchInputEvent as any);
-    expect(component.filterRows).toHaveBeenCalledTimes(0);
-  });
-
-  it('should fetch products and map them to table rows', () => {
-    const products = [
-      {
-        id: '1',
-        name: 'Product 1',
-        description: 'Description 1',
-        logo: '',
-        date_release: '2021-01-01',
-        date_revision: '2021-01-02',
-      },
-    ];
-    mockStore.select.mockReturnValue(of(products));
-    component['fetchProducts']();
-    expect(component.rows.length).toBeGreaterThan(-1);
-    expect(component.filteredRows.length).toBeGreaterThan(-1);
-  });
-
-  it('should handle "Eliminar" action and open modal', () => {
-    const row: TableRow = {
-      id: '1',
-      status: 'success',
-      label: 'Product 1',
-      columns: [
-        {
-          headerId: 'logo',
-          primaryText: '',
-          secundaryText: '',
-
-          avatar: { type: 'image', size: 'sm', src: '' },
-        },
-        {
-          headerId: 'name',
-          primaryText: 'Product 1',
-        },
-        {
-          headerId: 'description',
-          primaryText: 'Description 1',
-        },
-        {
-          headerId: 'date_release',
-          primaryText: '2021-01-01',
-        },
-        {
-          headerId: 'date_revision',
-          primaryText: '2021-01-02',
-        },
-      ],
-    };
-    jest.spyOn(store, 'dispatch');
-    jest.spyOn(modalService, 'show').mockReturnValue({
-      modalRef: { instance: { closed: { emit: jest.fn() } } },
-    } as any);
-
-    component.handleAction({ action: 'eliminar', row });
-
-    expect(store.dispatch).toHaveBeenCalledWith(
-      ProductActions.selectProductToDelete({ id: '1' })
+  it('Debe llamar a selectProductId y navegar a la edición cuando se selecciona "Editar"', () => {
+    const event = { action: 'Editar', row: mockTableRow };
+    component.handleAction(event);
+    expect(productApplicationService.selectProductId).toHaveBeenCalledWith(
+      mockTableRow.id
     );
-    expect(modalService.show).toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith([
+      '/financial-products/update',
+    ]);
   });
 
-  it('should dispatch delete action when formSubmit is triggered from modal', () => {
-    const product = { id: '1', name: 'Product 1' };
-    const data = {
-      title: 'Eliminar Producto',
-      description: '¿Estás seguro?',
-      product,
-    };
-    jest.spyOn(store, 'dispatch');
+  it('Debe abrir el modal y eliminar el producto cuando se selecciona "Eliminar"', () => {
+    const event = { action: 'Eliminar', row: mockTableRow };
+    const spyModalShow = jest.spyOn(modalService, 'show');
 
-    const contentRef = {
-      instance: {
-        formSubmit: of(true),
-      },
-    };
-    // modalService.show.mockReturnValue({ contentRef });
+    component.handleAction(event);
 
-    component.handleAction({
-      action: 'eliminar',
-      row: { id: '1', columns: [] } as any as TableRow,
-    });
-
-    contentRef.instance.formSubmit.subscribe(() => {
-      expect(store.dispatch).toHaveBeenCalledWith(
-        ProductActions.deleteProduct({ id: product.id })
-      );
-    });
+    expect(spyModalShow).toHaveBeenCalledWith(
+      DeleteProductComponent,
+      expect.any(Object)
+    );
   });
 
-  it('should hide modal when formCancel is triggered from modal', () => {
-    const contentRef = {
-      instance: {
-        formCancel: of(true),
-      },
-    };
-    // modalService.show.mockReturnValue({ contentRef });
+  it('Debe abrir el modal y eliminar el producto cuando se selecciona "Eliminar"', () => {
+    const event = { action: 'Eliminar', row: mockTableRow };
 
-    component.handleAction({
-      action: 'eliminar',
-      row: { id: '1', columns: [] } as any as TableRow,
-    });
+    component.handleAction(event);
 
-    contentRef.instance.formCancel.subscribe(() => {
-      expect(modalService.hide).toHaveBeenCalled();
-    });
+    expect(modalService.show).toHaveBeenCalledWith(
+      DeleteProductComponent,
+      expect.any(Object)
+    );
+
+    // Simular el evento de confirmación de eliminación
+    formSubmitSubject.next();
+
+    expect(productApplicationService.deleteProduct).toHaveBeenCalledWith(
+      mockProduct.id
+    );
+    expect(modalService.hide).toHaveBeenCalled();
+  });
+
+  it('Debe cerrar el modal cuando se cancela la eliminación', () => {
+    const event = { action: 'Eliminar', row: mockTableRow };
+
+    component.handleAction(event);
+
+    // Simular el evento de cancelación
+    formCancelSubject.next();
+
+    expect(modalService.hide).toHaveBeenCalled();
   });
 });

@@ -12,10 +12,18 @@ export const loadProductsIsEmpty = createAction(
   '[Product] Load Products Success',
   props<{ isEmpty: boolean }>()
 );
+
 export const loadProductsFailure = createAction(
   '[Product] Load Products Failure',
   props<{ error: string }>()
 );
+
+export const selectProductId = createAction(
+  '[Product] Select Product Id',
+  props<{ id: string }>()
+);
+
+export const emptyProduct = createAction('[Product] Load Products Is Empty');
 
 // Crear producto
 export const addProduct = createAction(

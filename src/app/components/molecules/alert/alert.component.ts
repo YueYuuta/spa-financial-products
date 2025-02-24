@@ -11,10 +11,10 @@ import { Component, Input, OnInit } from '@angular/core';
 export class AlertComponent implements OnInit {
   @Input() type: 'success' | 'error' | 'info' | 'warning' = 'info';
   @Input() message: string = '';
-  @Input() dismissible: boolean = false; // ✅ Para permitir cerrar manualmente
-  @Input() autoCloseTime?: number; // ✅ Tiempo en ms para cerrar automáticamente
+  @Input() dismissible: boolean = false;
+  @Input() autoCloseTime?: number;
 
-  show: boolean = true; // ✅ Controla la visibilidad del alerta
+  show: boolean = true;
 
   ngOnInit(): void {
     if (this.autoCloseTime) {

@@ -14,6 +14,7 @@ import {
   selectAddProductError,
   selectLoading,
 } from '../../store/selectors/product.selector';
+import { ProductApplicationService } from '../../services/product.aplication.service';
 
 @Component({
   selector: 'app-create-product',
@@ -28,22 +29,22 @@ import {
   styleUrl: './create-product.component.scss',
 })
 export class CreateProductComponent implements OnInit {
-  private store = inject(Store);
-  loading$: Observable<boolean> = this.store.select(selectLoading);
-  errorMessage$: Observable<string | null> = this.store.select(
-    selectAddProductError
+  private readonly _productAplicationService = inject(
+    ProductApplicationService
   );
-  successMessage$: Observable<string | null> = this.store.select(
-    selectAddProductSuccess
-  );
+  loading$: Observable<boolean> = this._productAplicationService.getLoading();
+  errorMessage$: Observable<string | null> =
+    this._productAplicationService.getCreateErrorUi();
+  successMessage$: Observable<string | null> =
+    this._productAplicationService.getCreateSuccessUi();
 
   ngOnInit(): void {}
 
   handleFormSubmit(product: Product) {
-    this.store.dispatch(ProductActions.addProduct({ product }));
+    this._productAplicationService.createProduct(product);
   }
 
   handleFormCancel() {
-    console.log('Formulario cancelado'); // 🚀 Aquí puedes redirigir a otra página si deseas
+    console.log('Form clean'); // 🚀 Aquí puedes redirigir a otra página si deseas
   }
 }

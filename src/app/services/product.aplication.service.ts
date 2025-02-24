@@ -7,22 +7,15 @@ import {
   filterTableRows,
 } from '../utils/products/product.utils';
 import { PRODUCT_STORE, ProductStore } from './product.store.interface';
-import { ModalService } from '../lib/modal/services';
-import { ModalData } from '../interfaces/modal-data.interface';
-import { DeleteProductComponent } from '../components/organisms/delete-product/delete-product.component';
-import { ModalInstance } from '../lib/modal/interfaces';
 
 @Injectable({ providedIn: 'root' })
 export class ProductApplicationService {
   private readonly _productStore = inject<ProductStore>(PRODUCT_STORE);
-  private readonly _modalService = inject(ModalService);
 
-  /** 🔹 Obtiene productos y los transforma en `TableRow[]` */
   getProductTableRows(): Observable<TableRow[]> {
     return this._productStore.getProducts().pipe(map(mapProductsToTableRows));
   }
 
-  /** 🔹 Filtra productos según búsqueda */
   filterProducts(search$: Observable<string>): Observable<TableRow[]> {
     return this.getProductTableRows().pipe(
       tap((data) => console.log('holaa', data)),
@@ -37,8 +30,23 @@ export class ProductApplicationService {
     return this._productStore.verifyProduct(id);
   }
 
+  updatProduct(id: string, product: Product) {
+    this._productStore.updateProduct(id, product);
+  }
+
+  createProduct(product: Product) {
+    this._productStore.createProduct(product);
+  }
+
   deleteProduct(id: string) {
     this._productStore.deleteProduct(id);
+  }
+  selectProductId(id: string) {
+    this._productStore.selectProductId(id);
+  }
+
+  getProductIdSelect() {
+    return this._productStore.getProductIdSelect();
   }
 
   getDeleteSuccessUi(): Observable<string | null> {
@@ -46,5 +54,18 @@ export class ProductApplicationService {
   }
   getDeleteErrorUi(): Observable<string | null> {
     return this._productStore.getDeleteErrorUi();
+  }
+
+  getUpdateSuccessUi(): Observable<string | null> {
+    return this._productStore.getUpdateSuccessUi();
+  }
+  getUpdateErrorUi(): Observable<string | null> {
+    return this._productStore.getUpdateErrorUi();
+  }
+  getCreateSuccessUi(): Observable<string | null> {
+    return this._productStore.getCreateSuccessUi();
+  }
+  getCreateErrorUi(): Observable<string | null> {
+    return this._productStore.getCreateErrorUi();
   }
 }

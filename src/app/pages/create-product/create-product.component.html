@@ -1,4 +1,4 @@
-<!-- <app-spinner-overlay [show]="loading$ | async"></app-spinner-overlay> -->
+<app-spinner-overlay [show]="loading$ | async"></app-spinner-overlay>
 
 @defer (when successMessage$ | async) {
 <ng-container *ngIf="successMessage$ | async as success">

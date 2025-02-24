@@ -12,11 +12,9 @@ export const actionsTable: TableAction[] = [
   {
     id: 'editar',
     label: 'Editar',
-    action: (row) => alert(`Editando ${row.id}`),
   },
   {
     id: 'eliminar',
     label: 'Eliminar',
-    action: (row) => alert(`Eliminando ${row.id}`),
   },
 ];

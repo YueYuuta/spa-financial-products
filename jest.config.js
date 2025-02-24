@@ -12,7 +12,8 @@ module.exports = {
     coveragePathIgnorePatterns: [
         "<rootDir>/src/index\\.ts$",      // Ignora el index.ts en src/
         "<rootDir>/src/.*/index\\.ts$",   // Ignora cualquier index.ts en subcarpetas
-        "<rootDir>/src/main\\.ts$",       // Ignora main.ts
+        "<rootDir>/src/main\\.ts$",
+        "<rootDir>/src/app/lib/modal/services/modal.service.ts" ,      // Ignora main.ts
         "<rootDir>/src/environments/",    // Ignora carpetas de entorno
         "<rootDir>/src/app/app.config\\.ts$",  // Ignora app.config.ts
         "<rootDir>/src/app/app.routes\\.ts$",  // Ignora app.routes.ts

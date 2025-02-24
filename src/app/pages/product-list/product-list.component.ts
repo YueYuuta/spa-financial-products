@@ -23,11 +23,8 @@ import { AlertComponent } from '../../components/molecules/alert/alert.component
 import { ButtonComponent } from '../../components/atoms/button/button.component';
 import { Router } from '@angular/router';
 import { ModalService } from '../../lib/modal/services';
-
-import { ProductNgrxService } from '../../services/product.ngrx.service';
 import { actionsTable, headerTable } from './header-table';
 import { ProductApplicationService } from '../../services/product.aplication.service';
-import { PRODUCT_STORE } from '../../services/product.store.interface';
 import { mapTableRowToProduct } from '../../utils/products/product.utils';
 import { DeleteProductComponent } from '../../components/organisms/delete-product/delete-product.component';
 import { ModalData } from '../../interfaces/modal-data.interface';
@@ -81,7 +78,8 @@ export class ProductListComponent {
     const product = mapTableRowToProduct(event.row);
 
     if (event.action === 'Editar') {
-      this._productAplicationService.verifyProduct(event.row.id);
+      this._productAplicationService.selectProductId(event.row.id);
+      this.router.navigate(['/financial-products/update']);
     } else {
       const data: ModalData = {
         title: 'Eliminar Producto',
@@ -106,50 +104,5 @@ export class ProductListComponent {
         this._modalService.hide();
       });
     }
-    // if (event.action === 'Editar') {
-    // this.store.dispatch(
-    //   ProductActions.selectProductById({ id: event.row.id })
-    // );
-    // } else {
-    //   // 🔹 Disparar la acción para verificar si el producto existe
-    //   this.store.dispatch(
-    //     ProductActions.selectProductToDelete({ id: event.row.id })
-    //   );
-    //   // 🔹 Escuchar el producto seleccionado en el Store y abrir el modal (solo una vez)
-    //   this.selectedProduct$
-    //     .pipe(
-    //       filter((product) => !!product),
-    //       take(1) // ✅ Asegura que la suscripción se ejecuta solo una vez
-    //     )
-    //     .subscribe((product) => {
-    //       if (product) {
-    //         const data: ModalData = {
-    //           title: 'Eliminar Producto',
-    //           description: '¿Estás seguro de eliminar este producto?',
-    //           product,
-    //         };
-    //         const { modalRef, contentRef } = this._modalService.show(
-    //           DeleteProductComponent,
-    //           {
-    //             initialState: { data },
-    //             initialStateModal: {
-    //               title: 'Eliminar Producto',
-    //               modalClass: 'xs',
-    //             },
-    //             selector: 'body',
-    //           }
-    //         );
-    //         contentRef.instance.formSubmit.pipe(take(1)).subscribe(() => {
-    //           this.store.dispatch(
-    //             ProductActions.deleteProduct({ id: product.id })
-    //           );
-    //           this._modalService.hide();
-    //         });
-    //         contentRef.instance.formCancel.pipe(take(1)).subscribe(() => {
-    //           this._modalService.hide();
-    //         });
-    //       }
-    //     });
-    // }
   }
 }
