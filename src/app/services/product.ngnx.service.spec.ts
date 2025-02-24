@@ -5,17 +5,7 @@ import { of } from 'rxjs';
 import { Product } from '../interfaces';
 import { ProductService } from './product.service';
 import * as ProductActions from '../store/actions/product.action';
-import {
-  selectAddProductError,
-  selectAddProductSuccess,
-  selectAllProducts,
-  SelectDeleteProductError,
-  SelectDeleteProductSuccess,
-  selectLoading,
-  selectProductId,
-  selectUpdateProductError,
-  selectUpdateProductSuccess,
-} from '../store/selectors/product.selector';
+
 import { ProductNgrxService } from './product.ngrx.service';
 
 describe('ProductNgrxService', () => {
