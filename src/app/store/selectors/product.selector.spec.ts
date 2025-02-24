@@ -7,6 +7,7 @@ describe('Product Selectors', () => {
 
   beforeEach(() => {
     initialState = {
+      selectProductId: null,
       products: [
         {
           id: '1',

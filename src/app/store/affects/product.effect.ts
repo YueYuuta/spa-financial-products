@@ -10,6 +10,8 @@ import {
   pipe,
   withLatestFrom,
   take,
+  switchMap,
+  EMPTY,
 } from 'rxjs';
 import * as ProductActions from '../actions/product.action';
 import { ProductService } from '../../services/product.service';
@@ -77,34 +79,54 @@ export class ProductEffects {
     { dispatch: false }
   );
 
-  loadProducts$ = createEffect(() =>
+  loadProductsOpti$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ProductActions.loadProducts),
       withLatestFrom(this.store.pipe(select((state) => state.products))),
-      filter(([_, state]) => !state.isEmpty),
-      mergeMap(([_, state]) => {
-        if (state.products.length > 0) {
-          return of(
-            ProductActions.loadProductsSuccess({ products: state.products })
-          );
-        } else {
-          return this.productService.getProducts().pipe(
-            map((response) => {
-              if (response.data.length === 0) {
-                return ProductActions.loadProductsSuccess({ products: [] });
-              }
-              return ProductActions.loadProductsSuccess({
-                products: response.data,
-              });
-            }),
-            catchError((error) =>
-              of(ProductActions.loadProductsFailure({ error: error.message }))
-            )
-          );
+      switchMap(([actions, products]) => {
+        if (products.length > 0) {
+          return EMPTY;
         }
+        return this.productService.getProducts().pipe(
+          map((products) => {
+            if (products.data.length === 0) {
+              return ProductActions.emptyProduct();
+            }
+            return ProductActions.loadProductsSuccess({
+              products: products.data,
+            });
+          }), // 🔹 Si la API responde bien
+          catchError(
+            (error) =>
+              of(ProductActions.loadProductsFailure({ error: error.message })) // 🔹 Si hay un error
+          )
+        );
       })
     )
   );
+
+  verifyProduct$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ProductActions.verifyProduct),
+      withLatestFrom(this.store.pipe(select((state) => state.products))),
+      switchMap(([actions, products]) => {
+        if (products.length > 0) {
+          return EMPTY;
+        }
+        return this.productService.getProducts().pipe(
+          tap((data) => console.log('holaa', data)),
+          map((products) =>
+            ProductActions.loadProductsSuccess({ products: products.data })
+          ), // 🔹 Si la API responde bien
+          catchError(
+            (error) =>
+              of(ProductActions.loadProductsFailure({ error: error.message })) // 🔹 Si hay un error
+          )
+        );
+      })
+    )
+  );
+
   addProduct$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ProductActions.addProduct),

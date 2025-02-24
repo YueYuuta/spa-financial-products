@@ -16,11 +16,14 @@ import { reducers, metaReducers } from './store/reducers';
 import { provideEffects } from '@ngrx/effects';
 import { ProductEffects } from './store/affects/product.effect';
 import { HttpErrorInterceptor } from './interceptors/http-error.interceptor';
+import { PRODUCT_STORE } from './services/product.store.interface';
+import { ProductNgrxService } from './services/product.ngrx.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
+    { provide: PRODUCT_STORE, useClass: ProductNgrxService },
     provideHttpClient(withInterceptorsFromDi()),
 
     { provide: HTTP_INTERCEPTORS, useClass: HttpErrorInterceptor, multi: true },

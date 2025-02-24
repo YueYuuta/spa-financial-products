@@ -20,6 +20,7 @@ describe('Product Reducer', () => {
       updateProductError: null,
       deleteProductError: null,
       selectedProductId: null,
+      selectProductId: null,
     };
   });
 

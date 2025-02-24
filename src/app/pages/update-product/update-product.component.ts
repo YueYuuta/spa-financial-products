@@ -15,6 +15,7 @@ import {
 } from '../../store/selectors/product.selector';
 
 import * as ProductActions from '../../store/actions/product.action';
+import { ProductApplicationService } from '../../services/product.aplication.service';
 
 @Component({
   selector: 'app-update-product',
@@ -29,28 +30,22 @@ import * as ProductActions from '../../store/actions/product.action';
   styleUrl: './update-product.component.scss',
 })
 export class UpdateProductComponent {
-  private store = inject(Store);
-  loading$: Observable<boolean> = this.store.select(
-    (state) => state.products.loading
+  private readonly _productAplicationService = inject(
+    ProductApplicationService
   );
+  loading$: Observable<boolean> = this._productAplicationService.getLoading();
+  error$: Observable<string | null> =
+    this._productAplicationService.getUpdateErrorUi();
+  success$: Observable<string | null> =
+    this._productAplicationService.getUpdateSuccessUi();
 
-  error$: Observable<string | null> = this.store.select(
-    selectUpdateProductError
-  );
-  success$: Observable<string | null> = this.store.select(
-    selectUpdateProductSuccess
-  );
-
-  product$: Observable<Product | null> = this.store.select(
-    selectSelectedProduct
-  );
+  product$: Observable<Product> =
+    this._productAplicationService.getProductIdSelect();
 
   ngOnInit(): void {}
 
   handleFormSubmit(product: Product) {
-    this.store.dispatch(
-      ProductActions.updateProduct({ id: product.id, product })
-    );
+    this._productAplicationService.updatProduct(product.id, product);
   }
 
   handleFormCancel() {

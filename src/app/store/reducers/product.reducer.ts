@@ -4,6 +4,7 @@ import { Product } from '../../interfaces';
 
 export interface ProductState {
   products: Product[];
+  selectProductId: string | null;
   loading: boolean;
   loadingSelect: boolean;
   error: string | null;
@@ -32,12 +33,19 @@ const initialState: ProductState = {
   deleteProductError: null,
   loadingSelect: false,
   selectedProductId: null,
+  selectProductId: null,
 };
 
 export const productReducer = createReducer(
   initialState,
   // ✅ Comienza la verificación del ID
   on(ProductActions.selectProductById, (state) => ({
+    ...state,
+    loadingSelect: true, // 🔄 Activamos el estado de carga
+    error: null,
+  })),
+
+  on(ProductActions.verifyProduct, (state) => ({
     ...state,
     loadingSelect: true, // 🔄 Activamos el estado de carga
     error: null,
@@ -74,6 +82,16 @@ export const productReducer = createReducer(
     loading: false,
     error,
     success: null,
+  })),
+
+  on(ProductActions.emptyProduct, (state) => ({
+    ...state,
+    loading: false,
+  })),
+
+  on(ProductActions.selectProductId, (state, { id }) => ({
+    ...state,
+    selectProductId: id,
   })),
 
   // ✅ Creando productos
