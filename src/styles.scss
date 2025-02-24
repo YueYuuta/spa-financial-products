@@ -1,8 +1,10 @@
-/* You can add global styles to this file, and also import other style files */
-/*==================== GOOGLE FONTS ====================*/
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap");
+// /* You can add global styles to this file, and also import other style files */
+// /*==================== GOOGLE FONTS ====================*/
+// @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap");
 
-/*==================== VARIABLES CSS ====================*/
+// /*==================== VARIABLES CSS ====================*/
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap");
 
 *,
 :after,
@@ -15,7 +17,10 @@ body {
   font-family: "Inter", sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f4f8fb;
+  background-color: #f4f6f9;
+  color: #2c2c30;
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
 :root {
@@ -31,7 +36,7 @@ body {
   --disabled-text-color: #718096; // Gris oscuro para texto deshabilitado
 
   // 🎯 VALIDACIONES
-  --danger-color: #e53e3e; // Rojo intenso, error
+  --danger-color: #d50707; // Rojo intenso, error
   --succes-color: #38a169; // Verde intenso, éxito
 
   // ⚡ EFECTOS Y TRANSICIONES
@@ -43,11 +48,11 @@ body {
   --small-font-size: 0.813rem;
 
   // 🎨 COLORES BASE PARA BOTONES
-  --btn-primary-background: #ecd672; // 🎨 Amarillo pastel (como en la imagen)
-  --btn-primary-text: #5c5c5c; // 🎨 Texto gris oscuro (para contraste en amarillo)
+  --btn-primary-background: #ffdd00; // 🎨 Amarillo pastel (como en la imagen)
+  --btn-primary-text: #0f265c; // 🎨 Texto gris oscuro (para contraste en amarillo)
 
-  --btn-secondary-background: #e6eaf1; // 🎨 Gris azulado suave (como en la imagen)
-  --btn-secondary-text: #2d3748; // 🎨 Azul oscuro (para texto en el botón secundario)
+  --btn-secondary-background: #e9ecf3; // 🎨 Gris azulado suave (como en la imagen)
+  --btn-secondary-text: #0f265c; // 🎨 Azul oscuro (para texto en el botón secundario)
 
   --btn-disabled-opacity: 0.5; // 🎨 Opacidad cuando está deshabilitado
 

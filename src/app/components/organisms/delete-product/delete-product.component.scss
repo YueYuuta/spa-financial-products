@@ -1,7 +1,10 @@
 .delete-product {
   &__description {
     margin: 0;
-    padding: 1rem;
+    padding: 1.5rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   &__footer {
     display: flex;

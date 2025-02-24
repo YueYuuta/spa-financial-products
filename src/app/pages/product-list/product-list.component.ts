@@ -90,7 +90,7 @@ export class ProductListComponent {
         {
           initialState: { data },
           initialStateModal: {
-            title: 'Eliminar Producto',
+            title: '',
             modalClass: 'xs',
           },
           selector: 'body',

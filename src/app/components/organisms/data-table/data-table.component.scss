@@ -10,9 +10,9 @@ $img-sizes: (
 
   padding: 1rem;
   background: #ffffff;
-  border-radius: 8px;
+  border-radius: 0.5rem;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  border: 1px solid #ddd;
+  // border: 1px solid #ddd;
   position: relative;
 
   &__primary-text {
@@ -67,11 +67,13 @@ $img-sizes: (
   &__header {
     background: #f8f9fa;
     font-weight: bold;
-    color: #333;
-    border-bottom: 2px solid #d1d9e0;
+    color: #2c2c30;
+    // border-bottom: 2px solid #d1d9e0;
+    border-bottom-width: 1px;
+    border-color: #dee3ed;
     &-container {
       display: flex;
-      gap: 8px;
+      gap: 1rem;
     }
     &-cell {
       text-align: left;
@@ -80,11 +82,12 @@ $img-sizes: (
       position: relative;
       white-space: nowrap;
       text-overflow: ellipsis;
+      font-weight: 600;
       // cursor: pointer;
 
       .sort-icon {
         // margin-left: 8px;
-        font-size: 12px;
+        font-size: 14px;
         cursor: pointer;
       }
     }
@@ -105,9 +108,11 @@ $img-sizes: (
 
       &-cell {
         padding: 12px;
-        border-bottom: 1px solid #e0e3e7;
-        color: #555;
+        border-bottom-width: 1px;
+        border-color: #e9ecf3;
+        color: #2c2c30;
         font-size: 14px;
+        font-weight: 500;
       }
     }
   }
@@ -128,11 +133,12 @@ $img-sizes: (
       font-size: 14px;
       background: none;
       border: none;
-      color: #6c757d;
+      color: #2c2c2c;
       padding: 4px;
       width: 24px;
       height: 24px;
       border-radius: 50%;
+      font-weight: 600;
       transition: background 0.2s ease-in-out;
       cursor: pointer;
 
@@ -148,7 +154,7 @@ $img-sizes: (
       left: 50%;
       transform: translateX(-50%);
       background: #fff;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: rgba(211, 211, 211, 0.52) 0px 1px 2px 2px;
       border-radius: 6px;
       min-width: 60px;
       z-index: 100;
@@ -159,7 +165,7 @@ $img-sizes: (
         display: block;
         padding: 0.5rem 0.25rem;
 
-        color: #333;
+        color: #2c2c30;
         text-decoration: none;
         transition: background 0.2s ease-in-out;
         font-size: 0.625rem;
