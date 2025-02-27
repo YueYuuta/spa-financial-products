@@ -1,6 +1,6 @@
 import { signal, computed, WritableSignal, Signal } from '@angular/core';
 
-export class StateService<T extends Record<string, any>> {
+export class NanoStateJC<T extends Record<string, any>> {
   private _state: {
     [K in keyof T]: WritableSignal<T[K]> | WritableSignal<T[K][number]>[];
   };
@@ -30,8 +30,8 @@ export class StateService<T extends Record<string, any>> {
 
   static create<T extends Record<string, any>>(
     initialState: T
-  ): StateService<T> {
-    return new StateService<T>(initialState);
+  ): NanoStateJC<T> {
+    return new NanoStateJC<T>(initialState);
   }
 
   // ✅ Obtener el estado actual como un objeto normal (sin signals)

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Product } from '../models/product.model';
 import { Signal } from '@angular/core';
-import { StateService } from './lib.v0.0.1.service';
+import { NanoStateJC } from './lib.v0.0.1.service';
 
 interface ProductState {
   products: Product[];
@@ -23,10 +23,10 @@ interface ProductState {
   providedIn: 'root',
 })
 export class ProductStateService {
-  private state: StateService<ProductState>;
+  private state: NanoStateJC<ProductState>;
 
   constructor() {
-    this.state = StateService.create<ProductState>({
+    this.state = NanoStateJC.create<ProductState>({
       products: [],
       selectProductId: null,
       loading: false,
