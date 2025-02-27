@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-
 import { Product } from '../models/product.model';
 import { Signal } from '@angular/core';
-import { StateService } from './lib.state.signal.service';
+import { StateService } from './lib.v0.0.1.service';
 
 interface ProductState {
   products: Product[];
@@ -44,32 +43,44 @@ export class ProductStateService {
     });
   }
 
+  // ✅ Obtener el estado reactivo
   get<K extends keyof ProductState>(key: K): Signal<ProductState[K]> {
-    return this.state.get(key);
+    return this.state.modify(key).get();
   }
 
+  // ✅ Modificar valores de manera más intuitiva
   set<K extends keyof ProductState>(key: K, value: ProductState[K]): void {
-    this.state.set(key, value);
+    this.state.modify(key).set(value);
   }
 
+  // ✅ Agregar un producto sin modificar toda la lista
   addProduct(product: Product) {
-    this.state.addToArray('products', product);
+    this.state.modify('products').add(product);
   }
 
+  // ✅ Remover un producto por ID
   removeProduct(productId: string) {
-    this.state.setNested('user', 'name', 'hola');
-    this.state.setDeep('user.name', 'hola');
-    this.state.removeFromArray('products', (p) => p.id === productId);
+    this.state.modify('products').remove((p) => p.id === productId);
   }
 
+  // ✅ Modificar un producto existente por ID
   updateProduct(productId: string, updatedProduct: Partial<Product>) {
-    this.state.updateArrayItem(
-      'products',
+    this.state.modify('products').update(
       (p) => p.id === productId,
       (p) => ({
         ...p,
         ...updatedProduct,
       })
     );
+  }
+
+  // ✅ Modificar un valor anidado dentro del usuario
+  updateUserName(newName: string) {
+    this.state.modify('user').nested('name', newName);
+  }
+
+  // ✅ Modificar un valor profundamente anidado
+  deepUpdateUserName(newName: string) {
+    this.state.modify('user').deep('name', newName);
   }
 }

@@ -1,41 +1,119 @@
 import { signal, computed, WritableSignal, Signal } from '@angular/core';
 
 export class StateService<T extends Record<string, any>> {
-  private _state: { [K in keyof T]: WritableSignal<T[K]> };
+  private _state: {
+    [K in keyof T]: WritableSignal<T[K]> | WritableSignal<T[K][number]>[];
+  };
   private _initialState: T;
 
   private constructor(initialState: T) {
     this._initialState = { ...initialState };
-    this._state = {} as { [K in keyof T]: WritableSignal<T[K]> };
+    this._state = {} as {
+      [K in keyof T]: WritableSignal<T[K]> | WritableSignal<T[K][number]>[];
+    };
 
-    // Crear signals para cada propiedad
     Object.keys(initialState).forEach((key) => {
-      this._state[key as keyof T] = signal(initialState[key as keyof T]);
+      const value = initialState[key as keyof T];
+
+      if (Array.isArray(value)) {
+        // Solución: Tipar correctamente 'item' usando infer
+        type ArrayElement<T> = T extends (infer U)[] ? U : never;
+        this._state[key as keyof T] = value.map(
+          (item: ArrayElement<T[keyof T]>) => signal(item)
+        ) as WritableSignal<ArrayElement<T[keyof T]>>[];
+      } else {
+        this._state[key as keyof T] = signal(value);
+      }
     });
   }
 
-  // Método estático para instanciar el servicio
   static create<T extends Record<string, any>>(
     initialState: T
   ): StateService<T> {
     return new StateService<T>(initialState);
   }
 
-  // Getter computado para obtener valores reactivos
   get<K extends keyof T>(key: K): Signal<T[K]> {
-    return computed(() => this._state[key]());
+    if (Array.isArray(this._state[key])) {
+      type ArrayElement<T> = T extends (infer U)[] ? U : never;
+
+      return computed(() =>
+        (this._state[key] as WritableSignal<ArrayElement<T[K]>>[]).map((sig) =>
+          sig()
+        )
+      ) as Signal<T[K]>;
+    }
+
+    return computed(() => (this._state[key] as WritableSignal<T[K]>)());
   }
 
-  // Setter para modificar el estado
   set<K extends keyof T>(key: K, value: T[K]): void {
-    this._state[key].set(value);
+    if (Array.isArray(value)) {
+      type ArrayElement<T> = T extends (infer U)[] ? U : never;
+
+      this._state[key] = value.map((item: ArrayElement<T[K]>) =>
+        signal(item)
+      ) as WritableSignal<ArrayElement<T[K]>>[];
+    } else {
+      (this._state[key] as WritableSignal<T[K]>).set(value);
+    }
   }
 
+  // Agregar elemento a un array como una nueva señal
+  addToArray<K extends keyof T>(
+    key: K,
+    item: T[K] extends any[] ? T[K][number] : never
+  ): void {
+    if (Array.isArray(this._state[key])) {
+      (this._state[key] as WritableSignal<T[K][number]>[]).push(signal(item));
+    } else {
+      throw new Error(`${String(key)} is not an array`);
+    }
+  }
+
+  updateArrayItem<K extends keyof T>(
+    key: K,
+    predicate: (item: T[K] extends (infer U)[] ? U : never) => boolean,
+    updater: (
+      item: T[K] extends (infer U)[] ? U : never
+    ) => T[K] extends (infer U)[] ? U : never
+  ): void {
+    if (!Array.isArray(this._state[key])) {
+      throw new Error(`${String(key)} is not an array`);
+    }
+
+    type ArrayElement<T> = T extends (infer U)[] ? U : never;
+
+    const signalsArray = this._state[key] as WritableSignal<
+      ArrayElement<T[K]>
+    >[];
+
+    signalsArray.forEach((sig) => {
+      if (predicate(sig())) {
+        sig.set(updater(sig()));
+      }
+    });
+  }
+
+  // Eliminar un elemento del array sin perder la reactividad
+  removeFromArray<K extends keyof T>(
+    key: K,
+    predicate: (item: T[K] extends any[] ? T[K][number] : never) => boolean
+  ): void {
+    if (!Array.isArray(this._state[key])) {
+      throw new Error(`${String(key)} is not an array`);
+    }
+
+    const signalsArray = this._state[key] as WritableSignal<T[K][number]>[];
+    this._state[key] = signalsArray.filter(
+      (sig) => !predicate(sig())
+    ) as WritableSignal<T[K][number]>[];
+  }
   get state(): T {
     return Object.keys(this._state).reduce(
       (acc, key) => ({
         ...acc,
-        [key]: this._state[key as keyof T](),
+        [key]: (this._state[key as keyof T] as WritableSignal<T[keyof T]>)(),
       }),
       {} as T
     );
@@ -46,7 +124,15 @@ export class StateService<T extends Record<string, any>> {
     prop: P,
     value: NonNullable<T[K]>[P]
   ): void {
-    this._state[key].update((currentState) => {
+    const state = this._state[key];
+
+    if (Array.isArray(state)) {
+      throw new Error(
+        `setNested no soporta modificar arrays directamente en ${String(key)}`
+      );
+    }
+
+    (state as WritableSignal<T[K]>).update((currentState) => {
       if (
         currentState === null ||
         typeof currentState !== 'object' ||
@@ -55,34 +141,50 @@ export class StateService<T extends Record<string, any>> {
         currentState = {} as NonNullable<T[K]>; // Inicializa un objeto vacío si era null
       }
 
+      if (!(prop in currentState)) {
+        console.warn(
+          `La propiedad "${String(prop)}" no existía en ${String(
+            key
+          )} y fue creada.`
+        );
+      }
+
       return {
         ...currentState,
-        [prop]: value,
+        [prop]:
+          Array.isArray(currentState[prop]) && Array.isArray(value)
+            ? [...(currentState[prop] as any[]), ...value] // Si ambas son arrays, se concatenan
+            : value, // Si no es un array, simplemente se asigna el nuevo valor
       };
     });
   }
 
   setDeep<K extends keyof T>(path: string, value: any): void {
-    this.getWritableSignal(path.split('.')[0] as K).update((currentState) => {
-      const keys = path.split('.');
-      let obj: any = currentState;
+    const keys = path.split('.');
+    const rootKey = keys[0] as K;
 
-      for (let i = 0; i < keys.length - 1; i++) {
+    this.getWritableSignal(rootKey).update((currentState) => {
+      let obj: any = structuredClone
+        ? structuredClone(currentState)
+        : { ...currentState };
+
+      let temp = obj;
+      for (let i = 1; i < keys.length - 1; i++) {
         const key = keys[i];
 
-        if (obj[key] === undefined || obj[key] === null) {
-          obj[key] = {}; // Inicializa el objeto si es null o undefined
-        } else if (typeof obj[key] !== 'object') {
+        if (temp[key] === undefined || temp[key] === null) {
+          temp[key] = {};
+        } else if (typeof temp[key] !== 'object') {
           throw new Error(
             `Path ${keys.slice(0, i + 1).join('.')} is not an object`
           );
         }
 
-        obj = obj[key];
+        temp = temp[key];
       }
 
-      obj[keys[keys.length - 1]] = value;
-      return { ...currentState }; // Devuelve un nuevo objeto para que Angular lo detecte
+      temp[keys[keys.length - 1]] = value;
+      return obj; // Retorna el objeto clonado con la actualización
     });
   }
 
@@ -90,71 +192,17 @@ export class StateService<T extends Record<string, any>> {
     return this._state[key] as WritableSignal<T[K]>;
   }
 
-  // Actualizar el estado basado en su valor actual
-  update<K extends keyof T>(key: K, updater: (current: T[K]) => T[K]): void {
-    this._state[key].update(updater);
-  }
-
-  // Métodos CRUD automáticos para arrays (con tipado seguro)
-  addToArray<K extends keyof T>(
-    key: K,
-    item: T[K] extends any[] ? T[K][number] : never
-  ): void {
-    if (Array.isArray(this._state[key]())) {
-      this._state[key].update(
-        (current) => [...(current as any[]), item] as T[K]
-      );
-    } else {
-      throw new Error(`${String(key)} is not an array`);
-    }
-  }
-
-  removeFromArray<K extends keyof T>(
-    key: K,
-    predicate: (item: T[K] extends any[] ? T[K][number] : never) => boolean
-  ): void {
-    if (Array.isArray(this._state[key]())) {
-      this._state[key].update(
-        (current) =>
-          (current as any[]).filter((item) => !predicate(item)) as T[K]
-      );
-    } else {
-      throw new Error(`${String(key)} is not an array`);
-    }
-  }
-
-  updateArrayItem<K extends keyof T>(
-    key: K,
-    predicate: (item: T[K] extends any[] ? T[K][number] : never) => boolean,
-    updater: (
-      item: T[K] extends any[] ? T[K][number] : never
-    ) => T[K] extends any[] ? T[K][number] : never
-  ): void {
-    if (Array.isArray(this._state[key]())) {
-      this._state[key].update(
-        (current) =>
-          (current as any[]).map((item) =>
-            predicate(item) ? updater(item) : item
-          ) as T[K]
-      );
-    } else {
-      throw new Error(`${String(key)} is not an array`);
-    }
-  }
-
-  findOne<K extends keyof T>(
-    key: K,
-    predicate: (item: T[K] extends any[] ? T[K][number] : never) => boolean
-  ): T[K] extends any[] ? T[K][number] | undefined : never {
-    if (Array.isArray(this._state[key]())) {
-      return (this._state[key]() as any[]).find(predicate) as any;
-    } else {
-      throw new Error(`${String(key)} is not an array`);
-    }
-  }
   reset(): void {
     Object.keys(this._initialState).forEach((key) => {
-      this._state[key as keyof T].set(this._initialState[key as keyof T]);
+      if (Array.isArray(this._initialState[key])) {
+        this._state[key as keyof T] = (this._initialState[key] as any[]).map(
+          (item) => signal(item)
+        );
+      } else {
+        (this._state[key as keyof T] as WritableSignal<T[keyof T]>).set(
+          this._initialState[key as keyof T]
+        );
+      }
     });
   }
 }
