@@ -13,7 +13,8 @@ export interface ProductStore {
   verifyProduct(id: string): Signal<boolean>;
   deleteProduct(id: string): void;
   selectProductId(id: string): void;
-  getProductIdSelect(): Signal<Product>;
+  getProductSelected(): Signal<Product | null>;
+  setProductSelected(product: Product): void;
   getDeleteSuccessUi(): Signal<string | null>;
   getDeleteErrorUi(): Signal<string | null>;
   loadProducts(): void;
@@ -22,4 +23,6 @@ export interface ProductStore {
 
   getCreateSuccessUi(): Signal<string | null>;
   getCreateErrorUi(): Signal<string | null>;
+  getSuccessUi(): Signal<string | null>;
+  getErrorUi(): Signal<string | null>;
 }

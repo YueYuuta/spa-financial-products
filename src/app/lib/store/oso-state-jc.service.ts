@@ -3,7 +3,7 @@ import { signal, WritableSignal, Signal, computed } from '@angular/core';
 // Definición del tipo ArrayElement para trabajar con arrays
 type ArrayElement<T> = T extends (infer U)[] ? U : never;
 
-export class NanoStateJC<T extends Record<string, any>> {
+export class OsoStateJC<T extends Record<string, any>> {
   private _state: {
     [K in keyof T]: WritableSignal<T[K]> | WritableSignal<T[K][number]>[];
   };
@@ -12,27 +12,19 @@ export class NanoStateJC<T extends Record<string, any>> {
   constructor(initialState: T) {
     this._initialState = { ...initialState };
     this._state = {} as {
-      [K in keyof T]: WritableSignal<T[K]> | WritableSignal<T[K][number]>[];
+      [K in keyof T]: WritableSignal<T[K]>;
     };
 
     // Inicializar señales para cada propiedad del estado
     Object.keys(initialState).forEach((key) => {
       const value = initialState[key as keyof T];
-      if (Array.isArray(value)) {
-        this._state[key as keyof T] = value.map(
-          (item: ArrayElement<T[keyof T]>) => signal(item)
-        ) as WritableSignal<ArrayElement<T[keyof T]>>[];
-      } else {
-        this._state[key as keyof T] = signal(value);
-      }
+      this._state[key as keyof T] = signal(value);
     });
   }
 
   // Método estático para crear una instancia con el estado inicial
-  static create<T extends Record<string, any>>(
-    initialState: T
-  ): NanoStateJC<T> {
-    return new NanoStateJC<T>(initialState);
+  static create<T extends Record<string, any>>(initialState: T): OsoStateJC<T> {
+    return new OsoStateJC<T>(initialState);
   }
 
   // Obtener el estado actual (sin señales)
@@ -44,6 +36,11 @@ export class NanoStateJC<T extends Record<string, any>> {
       }),
       {} as T
     );
+  }
+
+  // Actualizar el valor de una propiedad
+  update<K extends keyof T>(key: K, value: T[K]) {
+    (this._state[key] as WritableSignal<T[K]>).set(value);
   }
 
   // Métodos de modificación de arrays
@@ -63,34 +60,6 @@ export class NanoStateJC<T extends Record<string, any>> {
         sig.set(updater(sig()));
       }
     });
-  }
-
-  private addItem<K extends keyof T>(
-    key: K,
-    item: T[K] extends (infer U)[] ? U : never
-  ) {
-    if (!Array.isArray(this._state[key])) {
-      throw new Error(`${String(key)} is not an array`);
-    }
-    (this._state[key] as WritableSignal<T[K][number]>[]).push(signal(item));
-  }
-
-  private removeItem<K extends keyof T>(
-    key: K,
-    predicate: (item: T[K] extends (infer U)[] ? U : never) => boolean
-  ) {
-    if (!Array.isArray(this._state[key])) {
-      throw new Error(`${String(key)} is not an array`);
-    }
-    const signalsArray = this._state[key] as WritableSignal<T[K][number]>[];
-    this._state[key] = signalsArray.filter(
-      (sig) => !predicate(sig())
-    ) as WritableSignal<T[K][number]>[];
-  }
-
-  // Actualizar el valor de una propiedad
-  update<K extends keyof T>(key: K, value: T[K]) {
-    (this._state[key] as WritableSignal<T[K]>).set(value);
   }
 
   // Modificar estructuras anidadas (nested)
@@ -139,49 +108,51 @@ export class NanoStateJC<T extends Record<string, any>> {
   // API para manejar modificaciones del estado
   modify<K extends keyof T>(key: K) {
     return {
-      // Obtener valor actual
       get: (): Signal<T[K]> => {
-        if (Array.isArray(this._state[key])) {
-          return computed(() =>
-            (this._state[key] as WritableSignal<ArrayElement<T[K]>>[]).map(
-              (sig) => sig()
-            )
-          ) as Signal<T[K]>;
-        }
         return computed(() => (this._state[key] as WritableSignal<T[K]>)());
       },
 
       // Establecer un nuevo valor
       set: (value: T[K]) => {
-        if (Array.isArray(value)) {
-          this._state[key] = value.map((item: ArrayElement<T[K]>) =>
-            signal(item)
-          ) as WritableSignal<ArrayElement<T[K]>>[];
-        } else {
-          (this._state[key] as WritableSignal<T[K]>).set(value);
-        }
+        (this._state[key] as WritableSignal<T[K]>).set(value);
       },
 
       // Actualizar elementos del array
       update: (
-        predicate: (item: T[K] extends (infer U)[] ? U : never) => boolean,
-        updater: (
-          item: T[K] extends (infer U)[] ? U : never
-        ) => T[K] extends (infer U)[] ? U : never
+        predicate: (item: ArrayElement<T[K]>) => boolean,
+        updater: (item: ArrayElement<T[K]>) => ArrayElement<T[K]>
       ) => {
-        this.updateArray(key, predicate, updater);
+        const currentArray = (this._state[key] as WritableSignal<T[K]>)();
+        if (!Array.isArray(currentArray)) {
+          throw new Error(`${String(key)} is not an array`);
+        }
+
+        const updatedArray = currentArray.map((item: ArrayElement<T[K]>) =>
+          predicate(item) ? updater(item) : item
+        );
+        (this._state[key] as WritableSignal<T[K]>).set(updatedArray as T[K]);
+      },
+      // Eliminar un item del array
+      remove: (predicate: (item: ArrayElement<T[K]>) => boolean) => {
+        const currentArray = (this._state[key] as WritableSignal<T[K]>)();
+        if (!Array.isArray(currentArray)) {
+          throw new Error(`${String(key)} is not an array`);
+        }
+
+        const updatedArray = currentArray.filter(
+          (item: ArrayElement<T[K]>) => !predicate(item)
+        );
+        (this._state[key] as WritableSignal<T[K]>).set(updatedArray as T[K]);
       },
 
       // Añadir un item al array
-      add: (item: T[K] extends (infer U)[] ? U : never) => {
-        this.addItem(key, item);
-      },
-
-      // Eliminar un item del array
-      remove: (
-        predicate: (item: T[K] extends (infer U)[] ? U : never) => boolean
-      ) => {
-        this.removeItem(key, predicate);
+      add: (item: ArrayElement<T[K]>) => {
+        const currentArray = (this._state[key] as WritableSignal<T[K]>)();
+        if (!Array.isArray(currentArray)) {
+          throw new Error(`${String(key)} is not an array`);
+        }
+        const updatedArray = [...currentArray, item];
+        (this._state[key] as WritableSignal<T[K]>).set(updatedArray as T[K]);
       },
 
       // Modificar una propiedad anidada

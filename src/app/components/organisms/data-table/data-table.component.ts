@@ -87,6 +87,7 @@ export class DataTableComponent implements OnInit {
     }
 
     this.processedRows = sortedRows;
+    this.currentPage = 1;
   }
 
   get paginatedRows() {

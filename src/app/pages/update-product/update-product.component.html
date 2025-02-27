@@ -1,20 +1,20 @@
-<!-- <app-spinner-overlay [show]="loading$ | async"></app-spinner-overlay>
+<app-spinner-overlay [show]="loading$()"></app-spinner-overlay>
 
-@defer (when success$ | async) {
-<ng-container *ngIf="success$ | async as success">
-  <app-alert
-    type="success"
-    [message]="success"
-    [autoCloseTime]="3000"
-  ></app-alert>
-</ng-container>
-} @defer (when error$ | async) {
-<ng-container *ngIf="error$ | async as error">
-  <app-alert type="error" [message]="error" [dismissible]="true"></app-alert>
-</ng-container>
+@defer (when success$()) {
+
+<app-alert
+  type="success"
+  [message]="success$()"
+  [autoCloseTime]="3000"
+></app-alert>
+
+} @defer (when error$()) {
+
+<app-alert type="error" [message]="error$()" [dismissible]="true"></app-alert>
+
 }
 
 <app-form-product
-  [product]="product$ | async"
+  [product]="product$()"
   (formSubmit)="handleFormSubmit($event)"
-></app-form-product> -->
+></app-form-product>

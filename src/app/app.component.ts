@@ -1,6 +1,5 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ProductStateService } from './store/signal/test.signal.service';
 
 @Component({
   selector: 'app-root',
@@ -11,9 +10,4 @@ import { ProductStateService } from './store/signal/test.signal.service';
 })
 export class AppComponent {
   title = 'spa-financial-products';
-  private readonly store = inject(ProductStateService);
-  error = this.store.get('error');
-  sendError() {
-    this.store.set('error', Math.random().toString());
-  }
 }

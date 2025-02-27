@@ -22,21 +22,18 @@ import { ProductApplicationService } from '../../services/product.aplication.ser
   styleUrl: './update-product.component.scss',
 })
 export class UpdateProductComponent {
-  // private readonly _productAplicationService = inject(
-  //   ProductApplicationService
-  // );
-  // loading$: Observable<boolean> = this._productAplicationService.getLoading();
-  // error$: Observable<string | null> =
-  //   this._productAplicationService.getUpdateErrorUi();
-  // success$: Observable<string | null> =
-  //   this._productAplicationService.getUpdateSuccessUi();
-  // product$: Observable<Product> =
-  //   this._productAplicationService.getProductIdSelect();
-  // ngOnInit(): void {}
-  // handleFormSubmit(product: Product) {
-  //   this._productAplicationService.updatProduct(product.id, product);
-  // }
-  // handleFormCancel() {
-  //   console.log('Formulario cancelado'); // 🚀 Aquí puedes redirigir a otra página si deseas
-  // }
+  private readonly _productAplicationService = inject(
+    ProductApplicationService
+  );
+  loading$ = this._productAplicationService.getLoading();
+  error$ = this._productAplicationService.getUpdateErrorUi();
+  success$ = this._productAplicationService.getUpdateSuccessUi();
+  product$ = this._productAplicationService.getProductSelected();
+  ngOnInit(): void {}
+  handleFormSubmit(product: Product) {
+    this._productAplicationService.updatProduct(product.id, product);
+  }
+  handleFormCancel() {
+    console.log('Formulario cancelado'); // 🚀 Aquí puedes redirigir a otra página si deseas
+  }
 }

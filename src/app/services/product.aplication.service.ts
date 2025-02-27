@@ -11,21 +11,31 @@ import { PRODUCT_STORE, ProductStore } from './product.store.interface';
 @Injectable({ providedIn: 'root' })
 export class ProductApplicationService {
   private readonly _productStore = inject<ProductStore>(PRODUCT_STORE);
+  private search = signal('');
 
   getProductTableRows(): Signal<TableRow[]> {
-    // const s = this._productStore.getProducts();
-    // console.log(s());
     return computed(() =>
       mapProductsToTableRows(this._productStore.getProducts()())
     );
-    // return this._productStore.getProducts().pipe(map(mapProductsToTableRows));
   }
 
-  filterProducts(searchTerm: string): Signal<TableRow[]> {
+  filterProducts(): Signal<TableRow[]> {
     return computed(() => {
-      const productRow = this.getProductTableRows()();
-      return filterTableRows(productRow, searchTerm);
+      const productRows = mapProductsToTableRows(
+        this._productStore.getProducts()()
+      );
+
+      // Si el searchTerm está vacío, devolvemos todos los productos
+      if (!this.search().trim()) {
+        return productRows; // Aquí, aseguramos que se devuelvan todos los productos cuando el término esté vacío.
+      }
+
+      // Si hay un término de búsqueda, aplicamos el filtro
+      return filterTableRows(productRows, this.search());
     });
+  }
+  setSearch(term: string) {
+    this.search.set(term);
   }
 
   loadProducts() {
@@ -35,46 +45,50 @@ export class ProductApplicationService {
   getLoading(): Signal<boolean> {
     return this._productStore.getLoading();
   }
-  // verifyProduct(id: string): Observable<boolean> {
-  //   return this._productStore.verifyProduct(id);
-  // }
 
-  // updatProduct(id: string, product: Product) {
-  //   this._productStore.updateProduct(id, product);
-  // }
+  updatProduct(id: string, product: Product) {
+    this._productStore.updateProduct(id, product);
+  }
 
   createProduct(product: Product) {
     this._productStore.createProduct(product);
   }
 
-  // deleteProduct(id: string) {
-  //   this._productStore.deleteProduct(id);
-  // }
-  // selectProductId(id: string) {
-  //   this._productStore.selectProductId(id);
-  // }
+  getProductSelected(): Signal<Product | null> {
+    return this._productStore.getProductSelected();
+  }
+  setProductSelected(product: Product): void {
+    this._productStore.setProductSelected(product);
+  }
 
-  // getProductIdSelect() {
-  //   return this._productStore.getProductIdSelect();
-  // }
+  deleteProduct(id: string) {
+    this._productStore.deleteProduct(id);
+  }
 
-  // getDeleteSuccessUi(): Observable<string | null> {
-  //   return this._productStore.getDeleteSuccessUi();
-  // }
-  // getDeleteErrorUi(): Observable<string | null> {
-  //   return this._productStore.getDeleteErrorUi();
-  // }
+  getDeleteSuccessUi(): Signal<string | null> {
+    return this._productStore.getDeleteSuccessUi();
+  }
+  getDeleteErrorUi(): Signal<string | null> {
+    return this._productStore.getDeleteErrorUi();
+  }
 
-  // getUpdateSuccessUi(): Observable<string | null> {
-  //   return this._productStore.getUpdateSuccessUi();
-  // }
-  // getUpdateErrorUi(): Observable<string | null> {
-  //   return this._productStore.getUpdateErrorUi();
-  // }
+  getUpdateSuccessUi(): Signal<string | null> {
+    return this._productStore.getUpdateSuccessUi();
+  }
+  getUpdateErrorUi(): Signal<string | null> {
+    return this._productStore.getUpdateErrorUi();
+  }
   getCreateSuccessUi(): Signal<string | null> {
     return this._productStore.getCreateSuccessUi();
   }
   getCreateErrorUi(): Signal<string | null> {
     return this._productStore.getCreateErrorUi();
+  }
+
+  getSuccessUi(): Signal<string | null> {
+    return this._productStore.getSuccessUi();
+  }
+  getErrorUi(): Signal<string | null> {
+    return this._productStore.getErrorUi();
   }
 }
