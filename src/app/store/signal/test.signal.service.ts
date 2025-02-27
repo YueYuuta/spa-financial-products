@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Product } from '../models/product.model';
 import { Signal } from '@angular/core';
-import { NanoStateJC } from './lib.v0.0.1.service';
+import { NanoStateJC } from './lib.v0.0.2.service';
 
 interface ProductState {
   products: Product[];
@@ -63,13 +63,12 @@ export class ProductStateService {
     this.state.modify('products').remove((p) => p.id === productId);
   }
 
-  // ✅ Modificar un producto existente por ID
   updateProduct(productId: string, updatedProduct: Partial<Product>) {
     this.state.modify('products').update(
-      (p) => p.id === productId,
-      (p) => ({
+      (p: Product) => p.id === productId, // Predicado para encontrar el producto
+      (p: Product) => ({
         ...p,
-        ...updatedProduct,
+        ...updatedProduct, // Combina el producto original con los cambios
       })
     );
   }
