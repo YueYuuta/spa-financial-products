@@ -2,8 +2,10 @@ import { signal, computed, WritableSignal, Signal } from '@angular/core';
 
 export class StateService<T extends Record<string, any>> {
   private _state: { [K in keyof T]: WritableSignal<T[K]> };
+  private _initialState: T;
 
   private constructor(initialState: T) {
+    this._initialState = { ...initialState };
     this._state = {} as { [K in keyof T]: WritableSignal<T[K]> };
 
     // Crear signals para cada propiedad
@@ -27,6 +29,65 @@ export class StateService<T extends Record<string, any>> {
   // Setter para modificar el estado
   set<K extends keyof T>(key: K, value: T[K]): void {
     this._state[key].set(value);
+  }
+
+  get state(): T {
+    return Object.keys(this._state).reduce(
+      (acc, key) => ({
+        ...acc,
+        [key]: this._state[key as keyof T](),
+      }),
+      {} as T
+    );
+  }
+
+  setNested<K extends keyof T, P extends keyof NonNullable<T[K]>>(
+    key: K,
+    prop: P,
+    value: NonNullable<T[K]>[P]
+  ): void {
+    this._state[key].update((currentState) => {
+      if (
+        currentState === null ||
+        typeof currentState !== 'object' ||
+        Array.isArray(currentState)
+      ) {
+        currentState = {} as NonNullable<T[K]>; // Inicializa un objeto vacío si era null
+      }
+
+      return {
+        ...currentState,
+        [prop]: value,
+      };
+    });
+  }
+
+  setDeep<K extends keyof T>(path: string, value: any): void {
+    this.getWritableSignal(path.split('.')[0] as K).update((currentState) => {
+      const keys = path.split('.');
+      let obj: any = currentState;
+
+      for (let i = 0; i < keys.length - 1; i++) {
+        const key = keys[i];
+
+        if (obj[key] === undefined || obj[key] === null) {
+          obj[key] = {}; // Inicializa el objeto si es null o undefined
+        } else if (typeof obj[key] !== 'object') {
+          throw new Error(
+            `Path ${keys.slice(0, i + 1).join('.')} is not an object`
+          );
+        }
+
+        obj = obj[key];
+      }
+
+      obj[keys[keys.length - 1]] = value;
+      return { ...currentState }; // Devuelve un nuevo objeto para que Angular lo detecte
+    });
+  }
+
+  private getWritableSignal<K extends keyof T>(key: K): WritableSignal<T[K]> {
+    return this._state[key] as WritableSignal<T[K]>;
   }
 
   // Actualizar el estado basado en su valor actual
@@ -90,5 +151,10 @@ export class StateService<T extends Record<string, any>> {
     } else {
       throw new Error(`${String(key)} is not an array`);
     }
+  }
+  reset(): void {
+    Object.keys(this._initialState).forEach((key) => {
+      this._state[key as keyof T].set(this._initialState[key as keyof T]);
+    });
   }
 }

@@ -17,6 +17,7 @@ interface ProductState {
   addProductError: string | null;
   updateProductError: string | null;
   deleteProductError: string | null;
+  user: { name: string; id: number } | null;
 }
 
 @Injectable({
@@ -39,6 +40,7 @@ export class ProductStateService {
       addProductError: null,
       updateProductError: null,
       deleteProductError: null,
+      user: null,
     });
   }
 
@@ -55,6 +57,8 @@ export class ProductStateService {
   }
 
   removeProduct(productId: string) {
+    this.state.setNested('user', 'name', 'hola');
+    this.state.setDeep('user.name', 'hola');
     this.state.removeFromArray('products', (p) => p.id === productId);
   }
 
