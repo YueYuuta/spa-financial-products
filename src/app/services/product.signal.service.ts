@@ -6,100 +6,71 @@ import {
   effect,
   runInInjectionContext,
   EnvironmentInjector,
+  Signal,
 } from '@angular/core';
 
 import { ProductService } from './product.service';
 import { Observable, tap } from 'rxjs';
-import { ProductSignalStore } from '../store-signals/product-store.signal.service';
+import { ProductSignalStore } from '../store/signal/product-store.signal.service';
 import { ProductStore } from './product.store.interface';
 import { Product } from '../interfaces';
+import { ProductSignalStore2 } from '../store/signal/product-store.service';
 
 @Injectable({ providedIn: 'root' })
 export class ProductSignalService implements ProductStore {
-  private productStore = inject(ProductSignalStore);
+  // private productStore = inject(ProductSignalStore);
   private productService = inject(ProductService);
+
+  private productStore2 = inject(ProductSignalStore2);
 
   private injector = inject(EnvironmentInjector);
 
   constructor(injector: EnvironmentInjector) {
     this.injector = injector; // ✅ Set the injected instance
   }
-  private toObservable<T>(signalValue: () => T): Observable<T> {
-    return new Observable((subscriber) => {
-      subscriber.next(signalValue()); // Emit initial value
-
-      runInInjectionContext(this.injector, () => {
-        const ref = effect(() => {
-          subscriber.next(signalValue()); // Emit reactive changes
-        });
-
-        // Cleanup when Observable completes
-        return () => ref.destroy();
-      });
-    });
+  loadProducts(): void {
+    this.productStore2.loadProducts();
   }
-
-  getCreateSuccessUi(): Observable<string | null> {
-    return this.toObservable(() => this.productStore.addProductSuccess());
-  }
-
-  getCreateErrorUi(): Observable<string | null> {
-    return this.toObservable(() => this.productStore.addProductError());
-  }
-
-  getUpdateSuccessUi(): Observable<string | null> {
-    return this.toObservable(() => this.productStore.updateProductSuccess());
-  }
-
-  getUpdateErrorUi(): Observable<string | null> {
-    return this.toObservable(() => this.productStore.updateProductError());
-  }
-
-  getDeleteSuccessUi(): Observable<string | null> {
-    return this.toObservable(() => this.productStore.deleteProductSuccess());
-  }
-
-  getDeleteErrorUi(): Observable<string | null> {
-    return this.toObservable(() => this.productStore.deleteProductError());
-  }
-
-  getProductIdSelect(): Observable<Product> {
-    return this.toObservable(() => this.productStore.selectedProduct()) as any;
-  }
-
-  selectProductId(id: string): void {
-    this.productStore.setSelectedProductId(id);
-  }
-
-  deleteProduct(id: string): void {
-    this.productStore.deleteProduct(id);
-  }
-
-  verifyProduct(id: string): Observable<boolean> {
-    return this.productService.verifyProduct(id);
-  }
-
-  createProduct(product: Product): void {
-    this.productStore.addProduct(product);
-  }
-
   updateProduct(id: string, product: Product): void {
-    this.productStore.updateProduct(product);
+    throw new Error('Method not implemented.');
   }
-
-  getProducts(): Observable<Product[]> {
-    return this.toObservable(() => this.productStore.products()).pipe(
-      tap((products) => {
-        if (products.length === 0) {
-          queueMicrotask(() => this.productStore.loadProducts());
-        } else {
-          queueMicrotask(() => this.productStore.resetMessages());
-        }
-      })
-    );
+  createProduct(product: Product): void {
+    this.productStore2.createProduct(product);
   }
-
-  getLoading(): Observable<boolean> {
-    return this.toObservable(() => this.productStore.loading());
+  deleteProduct(id: string): void {
+    throw new Error('Method not implemented.');
+  }
+  selectProductId(id: string): void {
+    throw new Error('Method not implemented.');
+  }
+  getProducts(): Signal<Product[]> {
+    return this.productStore2.state.products$;
+  }
+  getLoading(): Signal<boolean> {
+    return this.productStore2.state.loading$;
+  }
+  verifyProduct(id: string): Signal<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  getProductIdSelect(): Signal<Product> {
+    throw new Error('Method not implemented.');
+  }
+  getDeleteSuccessUi(): Signal<string | null> {
+    throw new Error('Method not implemented.');
+  }
+  getDeleteErrorUi(): Signal<string | null> {
+    throw new Error('Method not implemented.');
+  }
+  getUpdateSuccessUi(): Signal<string | null> {
+    throw new Error('Method not implemented.');
+  }
+  getUpdateErrorUi(): Signal<string | null> {
+    throw new Error('Method not implemented.');
+  }
+  getCreateSuccessUi(): Signal<string | null> {
+    return this.productStore2.state2.addProductSuccess;
+  }
+  getCreateErrorUi(): Signal<string | null> {
+    return this.productStore2.state2.addProductError;
   }
 }

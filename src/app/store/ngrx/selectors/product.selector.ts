@@ -1,6 +1,7 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
-import { ProductState } from '../reducers/product.reducer';
-import { Product } from '../models';
+
+import { Product } from '../../models';
+import { ProductState } from '../../interface/store.product.interface';
 
 // ✅ Seleccionar la Feature State de productos
 export const selectProductState =

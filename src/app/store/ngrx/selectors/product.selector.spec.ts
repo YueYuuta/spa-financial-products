@@ -1,6 +1,5 @@
 import * as fromSelectors from './product.selector';
 import { ProductState } from '../reducers/product.reducer';
-import { Product } from '../models';
 
 describe('Product Selectors', () => {
   let initialState: ProductState;

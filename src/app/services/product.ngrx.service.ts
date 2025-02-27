@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { select, Store } from '@ngrx/store';
-import { AppState } from '../store/reducers';
+import { AppState } from '../store/ngrx/reducers';
 import { Observable, tap } from 'rxjs';
 import { Product } from '../interfaces';
 import {
@@ -13,13 +13,13 @@ import {
   selectProductId,
   selectUpdateProductError,
   selectUpdateProductSuccess,
-} from '../store/selectors/product.selector';
+} from '../store/ngrx/selectors/product.selector';
 import { ProductStore } from './product.store.interface';
-import * as ProductActions from '../store/actions/product.action';
+import * as ProductActions from '../store/ngrx/actions/product.action';
 import { ProductService } from './product.service';
 
 @Injectable({ providedIn: 'root' })
-export class ProductNgrxService implements ProductStore {
+export class ProductNgrxService {
   private _store: Store<AppState> = inject(Store<AppState>);
   private _productService = inject(ProductService);
   getCreateSuccessUi(): Observable<string | null> {

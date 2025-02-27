@@ -1,16 +1,20 @@
-<app-spinner-overlay [show]="loading$ | async"></app-spinner-overlay>
-
-@defer (when successMessage$ | async) {
-<ng-container *ngIf="successMessage$ | async as success">
+<app-spinner-overlay [show]="loading$()"></app-spinner-overlay>
+{{ successMessage$() }}
+@if (successMessage$()) {
+<ng-container>
   <app-alert
     type="success"
-    [message]="success"
+    [message]="successMessage$()"
     [autoCloseTime]="3000"
   ></app-alert>
 </ng-container>
-} @defer (when errorMessage$ | async) {
-<ng-container *ngIf="errorMessage$ | async as error">
-  <app-alert type="error" [message]="error" [dismissible]="true"></app-alert>
+} @if (errorMessage$()) {
+<ng-container>
+  <app-alert
+    type="error"
+    [message]="errorMessage$()"
+    [dismissible]="true"
+  ></app-alert>
 </ng-container>
 }
 

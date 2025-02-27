@@ -1,7 +1,8 @@
 import { isDevMode } from '@angular/core';
 import { ActionReducerMap, MetaReducer } from '@ngrx/store';
-import { productReducer, ProductState } from '../reducers/product.reducer';
+import { productReducer } from '../reducers/product.reducer';
 import { storeFreeze } from 'ngrx-store-freeze';
+import { ProductState } from '../../interface/store.product.interface';
 
 // Definir la interfaz del estado global
 export interface AppState {

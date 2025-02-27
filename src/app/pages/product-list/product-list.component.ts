@@ -46,63 +46,75 @@ import { ModalData } from '../../interfaces/modal-data.interface';
     ReactiveFormsModule,
   ],
 })
-export class ProductListComponent {
-  private _modalService = inject(ModalService);
-
-  private router = inject(Router);
-
+export class ProductListComponent implements OnInit {
+  headers = headerTable;
+  actions = actionsTable;
   private readonly _productAplicationService = inject(
     ProductApplicationService
   );
-  searchControl = new FormControl<string>('', { nonNullable: true });
-  loading$ = this._productAplicationService.getLoading();
-  errorDeleteProduct$ = this._productAplicationService.getDeleteErrorUi();
-  successDeleteProduct$ = this._productAplicationService.getDeleteSuccessUi();
+  private router = inject(Router);
+  products = this._productAplicationService.getProductTableRows();
 
-  filteredRows$ = this._productAplicationService.filterProducts(
-    this.searchControl.valueChanges.pipe(
-      startWith(''),
-      debounceTime(200),
-      distinctUntilChanged()
-    )
-  );
-
-  headers = headerTable;
-  actions = actionsTable;
+  ngOnInit(): void {
+    this._productAplicationService.loadProducts();
+  }
 
   create() {
     this.router.navigate(['/financial-products/create']);
   }
 
   handleAction(event: { action: string; row: TableRow }) {
-    const product = mapTableRowToProduct(event.row);
-
-    if (event.action === 'Editar') {
-      this._productAplicationService.selectProductId(event.row.id);
-      this.router.navigate(['/financial-products/update']);
-    } else {
-      const data: ModalData = {
-        title: 'Eliminar Producto',
-        product,
-      };
-      const { modalRef, contentRef } = this._modalService.show(
-        DeleteProductComponent,
-        {
-          initialState: { data },
-          initialStateModal: {
-            title: '',
-            modalClass: 'xs',
-          },
-          selector: 'body',
-        }
-      );
-      contentRef.instance.formSubmit.pipe(take(1)).subscribe(() => {
-        this._productAplicationService.deleteProduct(product.id);
-        this._modalService.hide();
-      });
-      contentRef.instance.formCancel.pipe(take(1)).subscribe(() => {
-        this._modalService.hide();
-      });
-    }
+    console.log('🚀 ~ ProductListComponent ~ event:', event);
   }
+  // private _modalService = inject(ModalService);
+  // private router = inject(Router);
+  // private readonly _productAplicationService = inject(
+  //   ProductApplicationService
+  // );
+  // searchControl = new FormControl<string>('', { nonNullable: true });
+  // loading$ = this._productAplicationService.getLoading();
+  // errorDeleteProduct$ = this._productAplicationService.getDeleteErrorUi();
+  // successDeleteProduct$ = this._productAplicationService.getDeleteSuccessUi();
+  // filteredRows$ = this._productAplicationService.filterProducts(
+  //   this.searchControl.valueChanges.pipe(
+  //     startWith(''),
+  //     debounceTime(200),
+  //     distinctUntilChanged()
+  //   )
+  // );
+  // headers = headerTable;
+  // actions = actionsTable;
+  // create() {
+  //   this.router.navigate(['/financial-products/create']);
+  // }
+  // handleAction(event: { action: string; row: TableRow }) {
+  //   const product = mapTableRowToProduct(event.row);
+  //   if (event.action === 'Editar') {
+  //     this._productAplicationService.selectProductId(event.row.id);
+  //     this.router.navigate(['/financial-products/update']);
+  //   } else {
+  //     const data: ModalData = {
+  //       title: 'Eliminar Producto',
+  //       product,
+  //     };
+  //     const { modalRef, contentRef } = this._modalService.show(
+  //       DeleteProductComponent,
+  //       {
+  //         initialState: { data },
+  //         initialStateModal: {
+  //           title: '',
+  //           modalClass: 'xs',
+  //         },
+  //         selector: 'body',
+  //       }
+  //     );
+  //     contentRef.instance.formSubmit.pipe(take(1)).subscribe(() => {
+  //       this._productAplicationService.deleteProduct(product.id);
+  //       this._modalService.hide();
+  //     });
+  //     contentRef.instance.formCancel.pipe(take(1)).subscribe(() => {
+  //       this._modalService.hide();
+  //     });
+  //   }
+  // }
 }

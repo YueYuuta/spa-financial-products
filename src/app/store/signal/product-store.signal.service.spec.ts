@@ -1,5 +1,5 @@
-import { ProductService } from '../services/product.service';
-import { Product } from '../interfaces';
+import { ProductService } from '../../services/product.service';
+import { Product } from '../../interfaces';
 import { catchError, of, throwError } from 'rxjs';
 import { ProductSignalStore } from './product-store.signal.service';
 

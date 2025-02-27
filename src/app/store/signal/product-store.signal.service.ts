@@ -1,7 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 
-import { ProductService } from '../services/product.service';
-import { Product } from '../interfaces';
+import { ProductService } from '../../services/product.service';
+import { Product } from '../../interfaces';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable({
@@ -39,8 +39,8 @@ export class ProductSignalStore {
     this.resetMessages();
     try {
       const response = await firstValueFrom(this.productService.getProducts());
-      if (response.data.length !== 0) {
-        this.products.set(response.data);
+      if (response.length !== 0) {
+        this.products.set(response);
       }
 
       this.success.set('Productos cargados correctamente');

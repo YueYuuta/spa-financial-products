@@ -1,23 +1,7 @@
 import { createReducer, on } from '@ngrx/store';
 import * as ProductActions from '../actions/product.action';
-import { Product } from '../../interfaces';
 
-export interface ProductState {
-  products: Product[];
-  selectProductId: string | null;
-  loading: boolean;
-  loadingSelect: boolean;
-  error: string | null;
-  success: string | null;
-  selectedProduct: Product | null;
-  addProductSuccess: string | null;
-  updateProductSuccess: string | null;
-  deleteProductSuccess: string | null;
-  addProductError: string | null;
-  updateProductError: string | null;
-  deleteProductError: string | null;
-  selectedProductId: Product | null;
-}
+import { ProductState } from '../../interface/store.product.interface';
 
 const initialState: ProductState = {
   products: [],

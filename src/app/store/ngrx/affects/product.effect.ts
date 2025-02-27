@@ -14,9 +14,9 @@ import {
   EMPTY,
 } from 'rxjs';
 import * as ProductActions from '../actions/product.action';
-import { ProductService } from '../../services/product.service';
+import { ProductService } from '../../../services/product.service';
 import { select, Store } from '@ngrx/store';
-import { Product } from '../models';
+import { Product } from '../../models';
 import { selectProductById } from '../selectors/product.selector';
 import { Router } from '@angular/router';
 
@@ -89,11 +89,11 @@ export class ProductEffects {
         }
         return this.productService.getProducts().pipe(
           map((products) => {
-            if (products.data.length === 0) {
+            if (products.length === 0) {
               return ProductActions.emptyProduct();
             }
             return ProductActions.loadProductsSuccess({
-              products: products.data,
+              products: products,
             });
           }), // 🔹 Si la API responde bien
           catchError(
@@ -116,7 +116,7 @@ export class ProductEffects {
         return this.productService.getProducts().pipe(
           tap((data) => console.log('holaa', data)),
           map((products) =>
-            ProductActions.loadProductsSuccess({ products: products.data })
+            ProductActions.loadProductsSuccess({ products: products })
           ), // 🔹 Si la API responde bien
           catchError(
             (error) =>

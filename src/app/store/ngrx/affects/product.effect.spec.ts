@@ -2,11 +2,11 @@ import { TestBed } from '@angular/core/testing';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { Observable, of, throwError } from 'rxjs';
 
-import { ProductService } from '../../services/product.service';
+import { ProductService } from '../../../services/product.service';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import * as ProductActions from '../actions/product.action';
-import { Product } from '../models';
+import { Product } from '../../models';
 import { ProductEffects } from './product.effect';
 
 describe('ProductEffects', () => {

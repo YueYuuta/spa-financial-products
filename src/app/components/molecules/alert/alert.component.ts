@@ -10,7 +10,7 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class AlertComponent implements OnInit {
   @Input() type: 'success' | 'error' | 'info' | 'warning' = 'info';
-  @Input() message: string = '';
+  @Input() message: string | null = '';
   @Input() dismissible: boolean = false;
   @Input() autoCloseTime?: number;
 
