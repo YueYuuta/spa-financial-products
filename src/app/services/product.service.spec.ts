@@ -45,8 +45,8 @@ describe('ProductService', () => {
     const mockResponse = { data: [mockProduct] };
 
     service.getProducts().subscribe((response) => {
-      expect(response.data.length).toBe(1);
-      expect(response.data).toEqual(mockResponse.data);
+      expect(response.length).toBe(1);
+      expect(response).toEqual(mockResponse.data);
     });
 
     const req = httpMock.expectOne(apiUrl);

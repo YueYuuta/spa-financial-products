@@ -1,6 +1,4 @@
 import { Injectable, Signal, computed, inject, signal } from '@angular/core';
-import { Observable, combineLatestWith, of, throwError } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
 import { Product, TableRow } from '../interfaces';
 import {
   mapProductsToTableRows,

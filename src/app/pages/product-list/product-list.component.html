@@ -38,6 +38,14 @@
 >
 </app-data-table>
 } -->
+@defer (when deleteProductSucces() ) {
+<app-alert
+  type="success"
+  [message]="deleteProductSucces()"
+  [dismissible]="true"
+></app-alert>
+}
+
 <header class="header-product-list">
   <input
     type="text"

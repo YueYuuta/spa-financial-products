@@ -4,7 +4,7 @@ import { select, Store } from '@ngrx/store';
 import { of } from 'rxjs';
 import { Product } from '../interfaces';
 import { ProductService } from './product.service';
-import * as ProductActions from '../store/actions/product.action';
+import * as ProductActions from '../store/ngrx/actions/product.action';
 
 import { ProductNgrxService } from './product.ngrx.service';
 

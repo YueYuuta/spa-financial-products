@@ -1,66 +1,35 @@
 import { TestBed } from '@angular/core/testing';
-import { ProductApplicationService } from './product.aplication.service';
-import { PRODUCT_STORE, ProductStore } from './product.store.interface';
-import { of } from 'rxjs';
-import { Product, TableRow } from '../interfaces';
-import {
-  mapProductsToTableRows,
-  filterTableRows,
-} from '../utils/products/product.utils';
 
-jest.mock('../utils/products/product.utils', () => ({
-  mapProductsToTableRows: jest.fn(),
-  filterTableRows: jest.fn(),
-}));
+import { PRODUCT_STORE, ProductStore } from './product.store.interface';
+import { Product } from '../interfaces';
+import { Signal, signal } from '@angular/core';
+import { ProductApplicationService } from './product.aplication.service';
 
 describe('ProductApplicationService', () => {
   let service: ProductApplicationService;
   let productStoreMock: jest.Mocked<ProductStore>;
 
-  const mockProduct: Product = {
-    id: '1',
-    name: 'Producto de prueba',
-    description: 'Descripción de prueba',
-    logo: 'https://example.com/logo.png',
-    date_release: '2023-01-01',
-    date_revision: '2025-01-01',
-  };
-
-  const mockTableRow: TableRow = {
-    id: '1',
-    status: 'success',
-    label: 'Producto de prueba',
-    columns: [
-      {
-        headerId: 'name',
-        primaryText: 'Producto de prueba',
-        secundaryText: 'Descripción de prueba',
-        avatar: {
-          type: 'image',
-          src: 'https://example.com/logo.png',
-          size: 'md',
-        },
-      },
-    ],
-  };
-
   beforeEach(() => {
     productStoreMock = {
-      getProducts: jest.fn().mockReturnValue(of([mockProduct])),
-      getLoading: jest.fn().mockReturnValue(of(false)),
-      verifyProduct: jest.fn().mockReturnValue(of(true)),
+      selectProductId: jest.fn(),
+      verifyProduct: jest.fn(),
+      getProducts: jest.fn((): Signal<Product[]> => signal([])),
+      loadProducts: jest.fn(),
       updateProduct: jest.fn(),
       createProduct: jest.fn(),
       deleteProduct: jest.fn(),
-      selectProductId: jest.fn(),
-      getProductIdSelect: jest.fn().mockReturnValue(of(mockProduct)),
-      getDeleteSuccessUi: jest.fn().mockReturnValue(of(null)),
-      getDeleteErrorUi: jest.fn().mockReturnValue(of(null)),
-      getUpdateSuccessUi: jest.fn().mockReturnValue(of(null)),
-      getUpdateErrorUi: jest.fn().mockReturnValue(of(null)),
-      getCreateSuccessUi: jest.fn().mockReturnValue(of(null)),
-      getCreateErrorUi: jest.fn().mockReturnValue(of(null)),
-    } as jest.Mocked<ProductStore>;
+      getLoading: jest.fn((): Signal<boolean> => signal(false)),
+      getProductSelected: jest.fn((): Signal<Product | null> => signal(null)),
+      setProductSelected: jest.fn(),
+      getDeleteSuccessUi: jest.fn((): Signal<string | null> => signal(null)),
+      getDeleteErrorUi: jest.fn((): Signal<string | null> => signal(null)),
+      getUpdateSuccessUi: jest.fn((): Signal<string | null> => signal(null)),
+      getUpdateErrorUi: jest.fn((): Signal<string | null> => signal(null)),
+      getCreateSuccessUi: jest.fn((): Signal<string | null> => signal(null)),
+      getCreateErrorUi: jest.fn((): Signal<string | null> => signal(null)),
+      getSuccessUi: jest.fn((): Signal<string | null> => signal(null)),
+      getErrorUi: jest.fn((): Signal<string | null> => signal(null)),
+    };
 
     TestBed.configureTestingModule({
       providers: [
@@ -72,102 +41,217 @@ describe('ProductApplicationService', () => {
     service = TestBed.inject(ProductApplicationService);
   });
 
-  it('Debe crearse correctamente', () => {
+  it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  it('Debe obtener productos y mapearlos a TableRow', (done) => {
-    (mapProductsToTableRows as jest.Mock).mockReturnValue([mockTableRow]);
-
-    service.getProductTableRows().subscribe((tableRows) => {
-      expect(tableRows).toEqual([mockTableRow]);
-      done();
-    });
+  it('should call loadProducts on product store', () => {
+    service.loadProducts();
+    expect(productStoreMock.loadProducts).toHaveBeenCalled();
   });
 
-  it('Debe filtrar productos correctamente', (done) => {
-    (mapProductsToTableRows as jest.Mock).mockReturnValue([mockTableRow]);
-    (filterTableRows as jest.Mock).mockReturnValue([mockTableRow]);
-
-    service.filterProducts(of('Producto')).subscribe((filteredRows) => {
-      expect(filterTableRows).toHaveBeenCalledWith([mockTableRow], 'Producto');
-      expect(filteredRows).toEqual([mockTableRow]);
-      done();
-    });
+  it('should return loading state', () => {
+    expect(service.getLoading()()).toBe(false);
   });
 
-  it('Debe obtener el estado de carga', (done) => {
-    service.getLoading().subscribe((loading) => {
-      expect(productStoreMock.getLoading).toHaveBeenCalled();
-      expect(loading).toBe(false);
-      done();
-    });
+  it('should call updateProduct with correct arguments', () => {
+    const product: Product = {
+      id: '1',
+      name: 'Test Product',
+      description: 'Test Description',
+      logo: 'test-logo.png',
+      date_release: '2025-03-03',
+      date_revision: '2025-09-03',
+    };
+    service.updatProduct('1', product);
+    expect(productStoreMock.updateProduct).toHaveBeenCalledWith('1', product);
   });
 
-  it('Debe verificar si un producto existe', (done) => {
-    service.verifyProduct('1').subscribe((exists) => {
-      expect(productStoreMock.verifyProduct).toHaveBeenCalledWith('1');
-      expect(exists).toBe(true);
-      done();
-    });
+  it('should call createProduct with correct product', () => {
+    const product: Product = {
+      id: '2',
+      name: 'New Product',
+      description: 'New Description',
+      logo: 'new-logo.png',
+      date_release: '2025-04-01',
+      date_revision: '2025-10-01',
+    };
+    service.createProduct(product);
+    expect(productStoreMock.createProduct).toHaveBeenCalledWith(product);
   });
 
-  it('Debe llamar a updateProduct con los datos correctos', () => {
-    service.updatProduct('1', mockProduct);
-    expect(productStoreMock.updateProduct).toHaveBeenCalledWith(
-      '1',
-      mockProduct
-    );
-  });
-
-  it('Debe llamar a createProduct con los datos correctos', () => {
-    service.createProduct(mockProduct);
-    expect(productStoreMock.createProduct).toHaveBeenCalledWith(mockProduct);
-  });
-
-  it('Debe llamar a deleteProduct con el ID correcto', () => {
+  it('should call deleteProduct with correct id', () => {
     service.deleteProduct('1');
     expect(productStoreMock.deleteProduct).toHaveBeenCalledWith('1');
   });
 
-  it('Debe seleccionar un producto por ID', () => {
-    service.selectProductId('1');
-    expect(productStoreMock.selectProductId).toHaveBeenCalledWith('1');
+  it('should update search term', () => {
+    service.setSearch('test');
+    expect(service['search']()).toBe('test');
   });
 
-  it('Debe obtener el producto seleccionado', (done) => {
-    service.getProductIdSelect().subscribe((product) => {
-      expect(productStoreMock.getProductIdSelect).toHaveBeenCalled();
-      expect(product).toEqual(mockProduct);
-      done();
-    });
+  it('should return the filtered products correctly', () => {
+    productStoreMock.getProducts.mockReturnValue(
+      signal([
+        {
+          id: '1',
+          name: 'Apple',
+          description: 'A fresh apple',
+          logo: 'apple-logo.png',
+          date_release: '2025-03-01',
+          date_revision: '2025-09-01',
+        },
+        {
+          id: '2',
+          name: 'Banana',
+          description: 'A yellow banana',
+          logo: 'banana-logo.png',
+          date_release: '2025-02-15',
+          date_revision: '2025-08-15',
+        },
+      ])
+    );
   });
 
-  it('Debe obtener los estados de UI (Delete, Update, Create)', (done) => {
-    service.getDeleteSuccessUi().subscribe((msg) => {
-      expect(msg).toBeNull();
-    });
+  it('should return selected product', () => {
+    const product: Product = {
+      id: '1',
+      name: 'Selected Product',
+      description: 'Test Description',
+      logo: 'test-logo.png',
+      date_release: '2025-05-01',
+      date_revision: '2025-11-01',
+    };
 
-    service.getDeleteErrorUi().subscribe((msg) => {
-      expect(msg).toBeNull();
-    });
+    productStoreMock.getProductSelected.mockReturnValue(signal(product));
 
-    service.getUpdateSuccessUi().subscribe((msg) => {
-      expect(msg).toBeNull();
-    });
+    expect(service.getProductSelected()()).toEqual(product);
+  });
 
-    service.getUpdateErrorUi().subscribe((msg) => {
-      expect(msg).toBeNull();
-    });
+  it('should set selected product', () => {
+    const product: Product = {
+      id: '1',
+      name: 'Selected Product',
+      description: 'Test Description',
+      logo: 'test-logo.png',
+      date_release: '2025-05-01',
+      date_revision: '2025-11-01',
+    };
 
-    service.getCreateSuccessUi().subscribe((msg) => {
-      expect(productStoreMock.getCreateSuccessUi).toHaveBeenCalled();
-      expect(msg).toBeNull();
-    });
+    service.setProductSelected(product);
+    expect(productStoreMock.setProductSelected).toHaveBeenCalledWith(product);
+  });
 
-    service.getCreateErrorUi().subscribe((msg) => {
-      expect(msg).toBeNull();
-      done();
-    });
+  it('should return delete success UI state', () => {
+    expect(service.getDeleteSuccessUi()()).toBeNull();
+  });
+
+  it('should return delete error UI state', () => {
+    expect(service.getDeleteErrorUi()()).toBeNull();
+  });
+
+  it('should return update success UI state', () => {
+    expect(service.getUpdateSuccessUi()()).toBeNull();
+  });
+
+  it('should return update error UI state', () => {
+    expect(service.getUpdateErrorUi()()).toBeNull();
+  });
+
+  it('should return create success UI state', () => {
+    expect(service.getCreateSuccessUi()()).toBeNull();
+  });
+
+  it('should return create error UI state', () => {
+    expect(service.getCreateErrorUi()()).toBeNull();
+  });
+
+  it('should return general success UI state', () => {
+    expect(service.getSuccessUi()()).toBeNull();
+  });
+
+  it('should return general error UI state', () => {
+    expect(service.getErrorUi()()).toBeNull();
+  });
+
+  it('should return product table rows correctly', () => {
+    productStoreMock.getProducts!.mockReturnValue(
+      signal([
+        {
+          id: '1',
+          name: 'Product A',
+          description: '',
+          logo: '',
+          date_release: '',
+          date_revision: '',
+        },
+        {
+          id: '2',
+          name: 'Product B',
+          description: '',
+          logo: '',
+          date_release: '',
+          date_revision: '',
+        },
+      ])
+    );
+
+    const result = service.getProductTableRows();
+    expect(result().length).toBe(2);
+  });
+
+  it('should return all products when search term is empty', () => {
+    productStoreMock.getProducts!.mockReturnValue(
+      signal([
+        {
+          id: '1',
+          name: 'Apple',
+          description: '',
+          logo: '',
+          date_release: '',
+          date_revision: '',
+        },
+        {
+          id: '2',
+          name: 'Banana',
+          description: '',
+          logo: '',
+          date_release: '',
+          date_revision: '',
+        },
+      ])
+    );
+
+    service.setSearch('');
+    const filteredProducts = service.filterProducts();
+    expect(filteredProducts().length).toBe(2);
+  });
+
+  it('should filter products correctly when search term is applied', () => {
+    productStoreMock.getProducts!.mockReturnValue(
+      signal([
+        {
+          id: '1',
+          name: 'Apple',
+          description: '',
+          logo: '',
+          date_release: '',
+          date_revision: '',
+        },
+        {
+          id: '2',
+          name: 'Banana',
+          description: '',
+          logo: '',
+          date_release: '',
+          date_revision: '',
+        },
+      ])
+    );
+
+    service.setSearch('Apple');
+    const filteredProducts = service.filterProducts();
+    expect(filteredProducts().length).toBe(1);
+    expect(filteredProducts()[0].id).toBe('1');
   });
 });

@@ -1,5 +1,5 @@
+import { ProductState } from '../../interface/store.product.interface';
 import * as fromSelectors from './product.selector';
-import { ProductState } from '../reducers/product.reducer';
 
 describe('Product Selectors', () => {
   let initialState: ProductState;

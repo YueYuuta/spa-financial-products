@@ -51,6 +51,7 @@ export class ProductListComponent implements OnInit {
   products: Signal<TableRow[]> =
     this._productAplicationService.filterProducts();
   success = this._productAplicationService.getCreateSuccessUi();
+  deleteProductSucces = this._productAplicationService.getDeleteSuccessUi();
   searchControl = new FormControl<string>('', { nonNullable: true });
   private destroyRef = inject(DestroyRef);
   private _modalService = inject(ModalService);

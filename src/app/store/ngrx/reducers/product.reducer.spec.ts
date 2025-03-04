@@ -1,6 +1,7 @@
-import { productReducer, ProductState } from './product.reducer';
+import { productReducer } from './product.reducer';
 import * as ProductActions from '../actions/product.action';
 import { Product } from '../../../interfaces';
+import { ProductState } from '../../interface/store.product.interface';
 
 describe('Product Reducer', () => {
   let initialState: ProductState;
